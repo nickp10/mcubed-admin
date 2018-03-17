@@ -1,0 +1,44 @@
+:local(.center) {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+:local(.content) {
+    background-color: #000000;
+    border-spacing: 1px;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 30%;
+}
+
+:local(.content) :global(td) {
+    background-color: #E4E7E9;
+    padding: 5px;
+}
+
+:local(.content) :global(th) {
+    background-color: #CCCCCC;
+    font-weight: bold;
+    font-size: 14pt;
+    padding: 5px;
+}
+
+:local(.highlight):hover :global(td) {
+    background-color: #AAA;
+}
+
+:local(.link), :local(.link):visited {
+    color: #1A6585;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+:local(.link):hover {
+    background-color: #1A6585;
+    color: #FFFFFF;
+}
+
+:local(.w75) {
+    width: 75%;
+}

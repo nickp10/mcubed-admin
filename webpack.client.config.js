@@ -1,13 +1,14 @@
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
 
-const BUILD_DIR = path.resolve(__dirname, "./build");
 const APP_DIR = path.resolve(__dirname, "./src/client");
+const BUILD_DIR = path.resolve(__dirname, "./build");
 
 module.exports = {
     entry: {
-        main: APP_DIR + "/index.tsx"
+        main: path.join(APP_DIR, "index.tsx")
     },
     output: {
         filename: "client.js",
@@ -16,30 +17,49 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.(ts|tsx)$/,
-                use: [{
-                    loader: "ts-loader"
-                }]
+                test: /\.(css)$/,
+                use: [
+                    {
+                        loader: "style-loader"
+                    },
+                    {
+                        loader: "typings-for-css-modules-loader",
+                        query: {
+                            modules: true,
+                            namedExport: true
+                        }
+                    }
+                ]
             },
             {
-                test: /\.(js|jsx)?$/,
-                use: [{
-                    loader: "babel-loader",
-                    options: {
-                        cacheDirectory: true,
-                        presets: ["react", "env"]
+                test: /\.(ts|tsx)$/,
+                loader: "ts-loader"
+            },
+            {
+                test: /\.(js|jsx)$/,
+                use: [
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            cacheDirectory: true,
+                            presets: ["react", "env"]
+                        }
                     }
-                }]
+                ]
             }
         ]
     },
     resolve: {
-        extensions: [".js", ".jsx", ".json", ".ts", ".tsx"]
+        extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".css"]
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: APP_DIR + "/index.ejs",
+            template: path.join(APP_DIR, "index.ejs"),
             inject: "body"
-        })
+        }),
+        new CopyWebpackPlugin([{
+            from: path.join(APP_DIR, "images"),
+            to: path.join(BUILD_DIR, "images")
+        }])
     ]
 };
