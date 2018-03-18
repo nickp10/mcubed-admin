@@ -29,7 +29,9 @@
     "express": "^4.16.3",
     "moment": "^2.21.0",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-dom": "^16.2.0",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2"
   },
   "devDependencies": {
     "@types/argv": "0.0.4",
@@ -37,6 +39,8 @@
     "@types/node": "^9.4.7",
     "@types/react": "^16.0.40",
     "@types/react-dom": "^16.0.4",
+    "@types/react-router": "^4.0.23",
+    "@types/react-router-dom": "^4.2.5",
     "babel": "^6.23.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.4",

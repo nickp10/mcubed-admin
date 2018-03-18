@@ -13,6 +13,7 @@ module.exports = {
     output: {
         filename: "client.js",
         path: BUILD_DIR,
+        publicPath: "/"
     },
     module: {
         rules: [
