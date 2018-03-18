@@ -1,6 +1,174 @@
+@font-face {
+    font-family: molot;
+    src: url("/Molot.otf") format("opentype");
+}
+
+:global(a), :global(a):hover, :global(a):visited {
+    color: #000000;
+    text-decoration: none;
+}
+
 :local(.app) {
     background-color: #FFFFFF;
     color: #000000;
     font-family: Calibri, sans-serif;
     font-size: 12pt;
+}
+
+:local(.mainDiv) {
+    background-color: #C5E9FB;
+    border: 2px solid #6AB5D5;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px #888888;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+:local(.headerDiv), :local(.contentDiv) {
+    border-bottom: 2px solid #6AB5D5;
+}
+
+:local(.headerTable) {
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+}
+
+:local(.titleCell) {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+:local(.title) {
+    font-family: molot;
+    font-size: 36pt;
+}
+
+:local(.titleLeftQuote) {
+    font-style: italic;
+    margin-right: 50px;
+}
+
+:local(.titleRightQuote) {
+    font-style: italic;
+    margin-left: 50px;
+}
+
+:local(.userCell) {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    text-align: center;
+    width: 1%;
+    vertical-align: middle;
+}
+
+:local(.userDiv) {
+    background-color: #E4E7E9;
+    border: 2px solid #6AB5D5;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px #888888;
+    padding: 10px;
+}
+
+:local(.loggedInBlock) {
+    margin-bottom: 10px;
+}
+
+:local(.center) {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+:local(.button), :local(.button):visited {
+    background-color: #CCCCCC;
+    border: 1px solid #666666;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px #666666;
+    cursor: pointer;
+    display: inline-block;
+    padding: 3px;
+
+    /* IE10 Consumer Preview */ 
+    background-image: -ms-linear-gradient(top, #EEEEEE 0%, #AAAAAA 100%);
+
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(top, #EEEEEE 0%, #AAAAAA 100%);
+
+    /* Opera */ 
+    background-image: -o-linear-gradient(top, #EEEEEE 0%, #AAAAAA 100%);
+
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #EEEEEE), color-stop(1, #AAAAAA));
+
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(top, #EEEEEE 0%, #AAAAAA 100%);
+
+    /* W3C Markup, IE10 Release Preview */ 
+    background-image: linear-gradient(to bottom, #EEEEEE 0%, #AAAAAA 100%);
+}
+
+:local(.button):hover {
+    background-color: #EAF7FF;
+
+    /* IE10 Consumer Preview */ 
+    background-image: -ms-linear-gradient(top, #EEEEEE 0%, #8AD5F5 100%);
+
+    /* Mozilla Firefox */ 
+    background-image: -moz-linear-gradient(top, #EEEEEE 0%, #8AD5F5 100%);
+
+    /* Opera */ 
+    background-image: -o-linear-gradient(top, #EEEEEE 0%, #8AD5F5 100%);
+
+    /* Webkit (Safari/Chrome 10) */ 
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #EEEEEE), color-stop(1, #8AD5F5));
+
+    /* Webkit (Chrome 11+) */ 
+    background-image: -webkit-linear-gradient(top, #EEEEEE 0%, #8AD5F5 100%);
+
+    /* W3C Markup, IE10 Release Preview */ 
+    background-image: linear-gradient(to bottom, #EEEEEE 0%, #8AD5F5 100%);
+}
+
+:local(.navigationTable) {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+:local(.navigationTable) :local(.navigationItem) {
+    border-bottom: 2px solid #6AB5D5;
+    border-right: 2px solid #6AB5D5;
+    cursor: pointer;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: center;
+    width: 20%;
+}
+
+:local(.navigationTable) :local(.navigationItem):last-child {
+    border-right: 0;
+}
+
+:local(.navigationTable) :local(.navigationItem):hover {
+    background-color: #EAF7FF !important;
+}
+
+:local(.navigationTable) :local(.navigationItem):local(.active) {
+    background-color: #E4E7E9;
+    border-bottom-color: #E4E7E9;
+}
+
+:local(.contentDiv) {
+    background-color: #E4E7E9;
+    padding: 10px;
+}
+
+:local(.copyrightDiv) {
+    font-size: small;
+    padding: 5px;
+    text-align: center;
 }

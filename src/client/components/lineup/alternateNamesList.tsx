@@ -63,18 +63,18 @@ export default class App extends Component<AlternateNamesListProps, AlternateNam
                     </tr>
                     {alternateNames.map(alternateName => (
                         <tr className={styles.highlight}>
-                            <td>{alternateName.externalName || 'N/A'}</td>
-                            <td>{alternateName.contestName || 'N/A'}</td>
+                            <td>{alternateName.externalName || "N/A"}</td>
+                            <td>{alternateName.contestName || "N/A"}</td>
                             <td dangerouslySetInnerHTML={this.formatDateHTML(alternateName)}></td>
                             <td>
-                                <a className={styles.link} href={"/EditLineupAlternateName?id=" + alternateName.id}>Edit</a>&nbsp;
-                                <a className={styles.link} href={"/DeleteLineupAlternateName?id=" + alternateName.id}>Delete</a>
+                                <a className={styles.link} href={"/lineup/alternateNames/edit?id=" + alternateName.id}>Edit</a>&nbsp;
+                                <a className={styles.link} href={"/lineup/alternateNames/delete?id=" + alternateName.id}>Delete</a>
                             </td>
                         </tr>
                     ))}
                     <tr>
-                        <th colSpan={4} className="center">
-                            <a className={styles.link} href="/EditLineupAlternateName">Add</a>
+                        <th colSpan={4} className={styles.center}>
+                            <a className={styles.link} href="/lineup/alternateNames/edit">Add</a>
                         </th>
                     </tr>
                 </table>

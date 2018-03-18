@@ -61,6 +61,10 @@ module.exports = {
         new CopyWebpackPlugin([{
             from: path.join(APP_DIR, "images"),
             to: path.join(BUILD_DIR, "images")
+        }, {
+            from: path.join(APP_DIR, "*.otf"),
+            to: BUILD_DIR,
+            flatten: true
         }])
     ]
 };

@@ -34,12 +34,55 @@ export default class App extends Component<AppProps, AppState> {
         if (error) {
             return (<div>{error}</div>);
         } else {
+            const NavigationItem = ({ match, to, text, ...rest }) => (
+                <Route path={match} children={(routeProps) => (
+                    <td className={`${styles.navigationItem} ${routeProps.match ? styles.active : ''}`}>
+                        <a href={to}>{text}</a>
+                    </td>
+                )} />
+            );
             return (
                 <BrowserRouter>
                     <div className={styles.app}>
-                        <Switch>
-                            <Route path="/lineup/alternateNames/list" component={AlternateNamesList} />
-                        </Switch>
+                        <div className={styles.mainDiv}>
+                            <div className={styles.headerDiv}>
+                                <table className={styles.headerTable}>
+                                    <tr>
+                                        <td className={styles.titleCell}>
+                                            <img src="/images/icon.png" height="50" width="50" alt="m" />
+                                            <span className={styles.title}>Cubed</span><br />
+                                            <span className={styles.titleLeftQuote}>"Running through the fire,</span><br />
+                                            <span className={styles.titleRightQuote}>daring you to follow me."</span>
+                                        </td>
+                                        <td className={styles.userCell}>
+                                            <div className={styles.userDiv}>
+                                                <div className={styles.loggedInBlock}>Welcome&nbsp;back!</div>
+                                                <div className={styles.center}>
+                                                    <a href="/logout" className={styles.button}>Logout</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <table className={styles.navigationTable}>
+                                <tr>
+                                    <NavigationItem match="/lineup/alternateNames" to="/lineup/alternateNames/list" text="Lineup: Alternate Names" />
+                                    <NavigationItem match="/lineup/missingNames" to="/lineup/missingNames/list" text="Lineup: Missing Names" />
+                                    <NavigationItem match="/wheel/categories" to="/wheel/categories/list" text="Wheel Capture: Categories" />
+                                    <NavigationItem match="/wheel/duplicates" to="/wheel/duplicates/list" text="Wheel Capture: Duplicates" />
+                                    <NavigationItem match="/wheel/unverified" to="/wheel/unverified/list" text="Wheel Capture: Unverified" />
+                                </tr>
+                            </table>
+                            <div className={styles.contentDiv}>
+                                <Switch>
+                                    <Route path="/lineup/alternateNames/list" component={AlternateNamesList} />
+                                </Switch>
+                            </div>
+                            <div className={styles.copyrightDiv}>
+                                &copy;2012-{new Date().getFullYear()} mCubed Technologies
+                            </div>
+                        </div>
                     </div>
                 </BrowserRouter>
             );
