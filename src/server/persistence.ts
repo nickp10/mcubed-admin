@@ -30,15 +30,31 @@ export default class Persistence {
         return undefined;
     }
 
-    async deleteMissingName(missingName: IMissingName): Promise<void> {
-        if (!this.isValid || !missingName || !missingName.id) {
+    async deleteMissingName(id: string): Promise<void> {
+        if (!this.isValid || !id) {
             return undefined;
         }
         try {
             await this.sendRequest({
-                path: `/lineupmissingnames/${missingName.id}`,
+                path: `/lineupmissingnames/${id}`,
                 method: "DELETE"
             });
+        } catch (error) {
+            log.error(error);
+        }
+        return undefined;
+    }
+
+    async getAlternateName(id: string): Promise<IAlternateName> {
+        if (!this.isValid || !id) {
+            return undefined;
+        }
+        try {
+            const response = await this.sendRequest({
+                path: `/lineupalternatenames/${id}`,
+                method: "GET"
+            });
+            return JSON.parse(response);
         } catch (error) {
             log.error(error);
         }
@@ -64,13 +80,44 @@ export default class Persistence {
         return undefined;
     }
 
-    async deleteAlternateName(alternateName: IAlternateName): Promise<void> {
+    async postAlternateName(alternateName: IAlternateName): Promise<IAlternateName> {
+        if (!this.isValid || !alternateName || alternateName.id) {
+            return undefined;
+        }
+        try {
+            const response = await this.sendRequest({
+                path: `/lineupalternatenames`,
+                method: "POST"
+            }, JSON.stringify(alternateName));
+            return JSON.parse(response);
+        } catch (error) {
+            log.error(error);
+        }
+        return undefined;
+    }
+
+    async putAlternateName(alternateName: IAlternateName): Promise<void> {
         if (!this.isValid || !alternateName || !alternateName.id) {
             return undefined;
         }
         try {
             await this.sendRequest({
                 path: `/lineupalternatenames/${alternateName.id}`,
+                method: "PUT"
+            }, JSON.stringify(alternateName));
+        } catch (error) {
+            log.error(error);
+        }
+        return undefined;
+    }
+
+    async deleteAlternateName(id: string): Promise<void> {
+        if (!this.isValid || !id) {
+            return undefined;
+        }
+        try {
+            await this.sendRequest({
+                path: `/lineupalternatenames/${id}`,
                 method: "DELETE"
             });
         } catch (error) {

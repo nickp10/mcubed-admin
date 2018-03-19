@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import AlternateNamesList from "./lineup/alternateNamesList";
+import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
+import AlternateNamesListComponent from "./lineup/alternateNamesList";
 import * as React from "react";
 import * as styles from "./app.css";
 
@@ -76,7 +77,8 @@ export default class App extends Component<AppProps, AppState> {
                             </table>
                             <div className={styles.contentDiv}>
                                 <Switch>
-                                    <Route path="/lineup/alternateNames/list" component={AlternateNamesList} />
+                                    <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
+                                    <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
                                 </Switch>
                             </div>
                             <div className={styles.copyrightDiv}>

@@ -13,7 +13,7 @@ export interface AlternateNamesListState {
     isLoaded?: boolean;
 }
 
-export default class App extends Component<AlternateNamesListProps, AlternateNamesListState> {
+export default class AlternateNamesListComponent extends Component<AlternateNamesListProps, AlternateNamesListState> {
     constructor(props: AlternateNamesListProps, context?: any) {
         super(props, context);
         this.state = {
@@ -24,7 +24,7 @@ export default class App extends Component<AlternateNamesListProps, AlternateNam
     formatDateHTML(alternateName: IAlternateName) {
         let date = "N/A";
         if (alternateName.lastUsedDate) {
-             date = moment(alternateName.lastUsedDate).format("MM/DD/YYYY hh:mm:ssA");
+             date = moment(alternateName.lastUsedDate).format("MM/DD/YYYY hh:mm:ss A");
         }
         return {
             __html: date.replace(/\s/g, "&nbsp;")
