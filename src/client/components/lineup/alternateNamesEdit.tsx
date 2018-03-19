@@ -4,7 +4,7 @@ import { RouteProps } from "react-router-dom";
 import * as moment from "moment";
 import * as qs from "querystring";
 import * as React from "react";
-import * as styles from "./alternateNamesList.css";
+import * as sharedStyles from "../shared.css";
 
 export interface AlternateNamesEditProps extends RouteProps {
 }
@@ -76,9 +76,9 @@ export default class AlternateNamesEditComponent extends Component<AlternateName
             return (
                 <form action="/lineup/alternateNames/edit" method="POST">
                     <input type="hidden" name="id" value={alternateName.id} />
-                    <table className={`${styles.content} ${styles.w75}`}>
+                    <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                         <tr>
-                            <th colSpan={2} className={styles.center}>{alternateName.id ? "Edit" : "Add"} Lineup Alternate Name</th>
+                            <th colSpan={2} className={sharedStyles.center}>{alternateName.id ? "Edit" : "Add"} Lineup Alternate Name</th>
                         </tr>
                         <tr>
                             <td>
@@ -99,7 +99,7 @@ export default class AlternateNamesEditComponent extends Component<AlternateName
                             </td>
                         </tr>
                         <tr>
-                            <th colSpan={2} className={styles.center}>
+                            <th colSpan={2} className={sharedStyles.center}>
                                 <input type="submit" value="Save" />
                             </th>
                         </tr>

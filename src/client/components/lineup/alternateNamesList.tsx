@@ -2,7 +2,7 @@ import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
 import * as moment from "moment";
 import * as React from "react";
-import * as styles from "./alternateNamesList.css";
+import * as sharedStyles from "../shared.css";
 
 export interface AlternateNamesListProps {
 }
@@ -54,27 +54,27 @@ export default class AlternateNamesListComponent extends Component<AlternateName
             return (<div>Loading...</div>);
         } else {
             return (
-                <table className={`${styles.content} ${styles.w75}`}>
+                <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                     <tr>
-                        <th className={styles.center}>External Name</th>
-                        <th className={styles.center}>Contest Name</th>
-                        <th className={styles.center}>Last Used</th>
-                        <th className={styles.center}>Actions</th>
+                        <th className={sharedStyles.center}>External Name</th>
+                        <th className={sharedStyles.center}>Contest Name</th>
+                        <th className={sharedStyles.center}>Last Used</th>
+                        <th className={sharedStyles.center}>Actions</th>
                     </tr>
                     {alternateNames.map(alternateName => (
-                        <tr className={styles.highlight}>
+                        <tr className={sharedStyles.highlight}>
                             <td>{alternateName.externalName || "N/A"}</td>
                             <td>{alternateName.contestName || "N/A"}</td>
                             <td dangerouslySetInnerHTML={this.formatDateHTML(alternateName)}></td>
                             <td>
-                                <a className={styles.link} href={"/lineup/alternateNames/edit?id=" + alternateName.id}>Edit</a>&nbsp;
-                                <a className={styles.link} href={"/lineup/alternateNames/delete?id=" + alternateName.id}>Delete</a>
+                                <a className={sharedStyles.link} href={"/lineup/alternateNames/edit?id=" + alternateName.id}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={"/lineup/alternateNames/delete?id=" + alternateName.id}>Delete</a>
                             </td>
                         </tr>
                     ))}
                     <tr>
-                        <th colSpan={4} className={styles.center}>
-                            <a className={styles.link} href="/lineup/alternateNames/edit">Add</a>
+                        <th colSpan={4} className={sharedStyles.center}>
+                            <a className={sharedStyles.link} href="/lineup/alternateNames/edit">Add</a>
                         </th>
                     </tr>
                 </table>
