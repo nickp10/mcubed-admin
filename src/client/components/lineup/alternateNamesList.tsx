@@ -3,6 +3,7 @@ import { IAlternateName } from "../../../interfaces";
 import * as moment from "moment";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
+import SortHeader, * as sorting from "../sorting";
 
 export interface AlternateNamesListProps {
 }
@@ -11,6 +12,8 @@ export interface AlternateNamesListState {
     alternateNames?: IAlternateName[];
     error?: string;
     isLoaded?: boolean;
+    sortAscending?: boolean;
+    sortProperty?: string;
 }
 
 export default class AlternateNamesListComponent extends Component<AlternateNamesListProps, AlternateNamesListState> {
@@ -31,13 +34,28 @@ export default class AlternateNamesListComponent extends Component<AlternateName
         };
     }
 
+    sortAlternateNames(sortProperty: string, sortAscending: boolean) {
+        this.setState((previousState, props) => {
+            return {
+                alternateNames: previousState.alternateNames,
+                sortAscending: sortAscending,
+                sortProperty: sortProperty,
+                isLoaded: previousState.isLoaded
+            };
+        });
+    }
+
     async componentDidMount() {
         try {
             const res = await fetch("/lineup/alternateNames/list/json");
             const alternateNames = await res.json();
-            this.setState({
-                alternateNames: alternateNames,
-                isLoaded: true
+            this.setState((previousState, props) => {
+                return {
+                    alternateNames: alternateNames,
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
+                    isLoaded: true
+                };
             });
         } catch (error) {
             this.setState({
@@ -56,12 +74,12 @@ export default class AlternateNamesListComponent extends Component<AlternateName
             return (
                 <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                     <tr>
-                        <th className={sharedStyles.center}>External Name</th>
-                        <th className={sharedStyles.center}>Contest Name</th>
-                        <th className={sharedStyles.center}>Last Used</th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="externalName" display="External Name" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="contestName" display="Contest Name" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="lastUsedDate" display="Last Used Date" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
                         <th className={sharedStyles.center}>Actions</th>
                     </tr>
-                    {alternateNames.map(alternateName => (
+                    {alternateNames.sort((a, b) => sorting.compareObjects(a, b, this.state)).map(alternateName => (
                         <tr className={sharedStyles.highlight}>
                             <td>{alternateName.externalName || "N/A"}</td>
                             <td>{alternateName.contestName || "N/A"}</td>
