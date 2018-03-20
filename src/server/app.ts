@@ -33,7 +33,7 @@ export default class App {
         app.get("/wheel/categories/list/json", async (req, res) => await this.getWheelCategories(req, res));
         app.get("/wheel/duplicates/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/wheel/words/list/json", async (req, res) => await this.getWheelWords(req, res));
-        app.get("/wheel/words/delete", async (req, res) => await this.deleteWheelWord(req, res));
+        app.get("/wheel/words/delete/json", async (req, res) => await this.deleteWheelWord(req, res));
         app.get("/wheel/words/edit", async (req, res) => await this.serveReactClientApp(req, res));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
@@ -144,7 +144,7 @@ export default class App {
     async deleteWheelWord(req: express.Request, res: express.Response): Promise<void> {
         try {
             await this.persistence.deleteWheelWord(req.query.id);
-            res.redirect("/wheel/duplicates/list");
+            res.sendStatus(200);
         } catch (error) {
             res.status(500).send(error);
         }

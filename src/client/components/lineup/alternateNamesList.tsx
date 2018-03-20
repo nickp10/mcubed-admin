@@ -90,6 +90,11 @@ export default class AlternateNamesListComponent extends Component<AlternateName
                             </td>
                         </tr>
                     ))}
+                    {alternateNames.length === 0 &&
+                        <tr>
+                            <td colSpan={4}>There are no alternate names.</td>
+                        </tr>
+                    }
                     <tr>
                         <th colSpan={4} className={sharedStyles.center}>
                             <a className={sharedStyles.link} href="/lineup/alternateNames/edit">Add</a>

@@ -81,6 +81,11 @@ export default class MissingNamesListComponent extends Component<MissingNamesLis
                             </td>
                         </tr>
                     ))}
+                    {missingNames.length === 0 &&
+                        <tr>
+                            <td colSpan={5}>There are no missing names.</td>
+                        </tr>
+                    }
                     <tr>
                         <th colSpan={5} className={sharedStyles.center}>
                             <a className={sharedStyles.link} href="/lineup/missingNames/delete">Delete All</a>

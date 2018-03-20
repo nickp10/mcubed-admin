@@ -43,6 +43,29 @@ export default class DuplicateWordsListComponent extends Component<DuplicateWord
         }
     }
 
+    async deleteWord(word: IWheelWord): Promise<void> {
+        try {
+            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`);
+            if (res.status === 200) {
+                this.setState((previousState, props) => {
+                    return {
+                        categories: previousState.categories,
+                        duplicateWords: previousState.duplicateWords.filter(w => w.word !== word.word),
+                        isLoaded: true
+                    };
+                });
+            } else {
+                this.setState({
+                    error: `Could not delete the word: ${word.word}`
+                });
+            }
+        } catch (error) {
+            this.setState({
+                error: error.message
+            });
+        }
+    }
+
     filterDuplicates(words: IWheelWord[]): IWheelWord[] {
         const emptyWord: IWheelWord = {};
         const duplicates: IWheelWord[] = [];
@@ -88,10 +111,15 @@ export default class DuplicateWordsListComponent extends Component<DuplicateWord
                             <td>{this.formatCategoryName(duplicateWord.categoryID) || "N/A"}</td>
                             <td>
                                 <a className={sharedStyles.link} href={"/wheel/words/edit?id=" + duplicateWord.id}>Edit</a>&nbsp;
-                                <a className={sharedStyles.link} href={"/wheel/words/delete?id=" + duplicateWord.id}>Delete</a>
+                                <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, duplicateWord)}>Delete</a>
                             </td>
                         </tr>
                     ))}
+                    {duplicateWords.length === 0 &&
+                        <tr>
+                            <td colSpan={3}>There are no duplicate words.</td>
+                        </tr>
+                    }
                 </table>
             );
         }
