@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
+import { RouteComponentProps } from "react-router-dom";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
@@ -13,8 +14,8 @@ export interface UnverifiedWordsListState {
     unverifiedWords?: IWheelWord[];
 }
 
-export default class UnverifiedWordsListComponent extends Component<UnverifiedWordsListProps, UnverifiedWordsListState> {
-    constructor(props: UnverifiedWordsListProps, context?: any) {
+export default class UnverifiedWordsListComponent extends Component<RouteComponentProps<UnverifiedWordsListProps>, UnverifiedWordsListState> {
+    constructor(props: RouteComponentProps<UnverifiedWordsListProps>, context?: any) {
         super(props, context);
         this.state = {
             categories: [],

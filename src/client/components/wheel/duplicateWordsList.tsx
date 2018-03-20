@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
+import { RouteComponentProps } from "react-router-dom";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
@@ -13,8 +14,8 @@ export interface DuplicateWordsListState {
     duplicateWords?: IWheelWord[];
 }
 
-export default class DuplicateWordsListComponent extends Component<DuplicateWordsListProps, DuplicateWordsListState> {
-    constructor(props: DuplicateWordsListProps, context?: any) {
+export default class DuplicateWordsListComponent extends Component<RouteComponentProps<DuplicateWordsListProps>, DuplicateWordsListState> {
+    constructor(props: RouteComponentProps<DuplicateWordsListProps>, context?: any) {
         super(props, context);
         this.state = {
             categories: [],

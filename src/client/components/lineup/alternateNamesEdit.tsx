@@ -1,12 +1,12 @@
 import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
-import { RouteProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import * as moment from "moment";
 import * as qs from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
-export interface AlternateNamesEditProps extends RouteProps {
+export interface AlternateNamesEditProps {
 }
 
 export interface AlternateNamesEditState {
@@ -17,8 +17,8 @@ export interface AlternateNamesEditState {
     isLoaded?: boolean;
 }
 
-export default class AlternateNamesEditComponent extends Component<AlternateNamesEditProps, AlternateNamesEditState> {
-    constructor(props: AlternateNamesEditProps, context?: any) {
+export default class AlternateNamesEditComponent extends Component<RouteComponentProps<AlternateNamesEditProps>, AlternateNamesEditState> {
+    constructor(props: RouteComponentProps<AlternateNamesEditProps>, context?: any) {
         super(props, context);
         const search = this.props.location.search;
         const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);

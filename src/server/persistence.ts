@@ -50,6 +50,10 @@ export default class Persistence {
         return await this.getAll<IWheelCategory>("wheelcategories");
     }
 
+    async deleteWheelCategory(id: string): Promise<void> {
+        return await this.deleteSingle("wheelcategories", id);
+    }
+
     async putWheelCategory(wheelCategory: IWheelWord): Promise<void> {
         return this.putSingle("wheelcategories", wheelCategory);
     }

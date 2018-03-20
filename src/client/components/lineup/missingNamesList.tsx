@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { IMissingName, Sport } from "../../../interfaces";
+import { RouteComponentProps } from "react-router-dom";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
@@ -15,8 +16,8 @@ export interface MissingNamesListState {
     sortProperty?: string;
 }
 
-export default class MissingNamesListComponent extends Component<MissingNamesListProps, MissingNamesListState> {
-    constructor(props: MissingNamesListProps, context?: any) {
+export default class MissingNamesListComponent extends Component<RouteComponentProps<MissingNamesListProps>, MissingNamesListState> {
+    constructor(props: RouteComponentProps<MissingNamesListProps>, context?: any) {
         super(props, context);
         this.state = {
             missingNames: []

@@ -29,6 +29,9 @@ export default class App {
         app.get("/lineup/missingNames/delete", async (req, res) => await this.deleteLineupMissingNames(req, res));
         app.get("/lineup/missingNames/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/lineup/missingNames/list/json", async (req, res) => await this.getLineupMissingNames(req, res));
+        app.get("/wheel/categories/:id/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/wheel/categories/delete/json", async (req, res) => await this.deleteWheelCategory(req, res));
+        app.get("/wheel/categories/edit", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/wheel/categories/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/wheel/categories/list/json", async (req, res) => await this.getWheelCategories(req, res));
         app.get("/wheel/duplicates/list", async (req, res) => await this.serveReactClientApp(req, res));
@@ -120,6 +123,15 @@ export default class App {
         try {
             const wheelCategories = await this.persistence.getWheelCategories();
             res.status(200).send(wheelCategories);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async deleteWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            await this.persistence.deleteWheelCategory(req.query.id);
+            res.sendStatus(200);
         } catch (error) {
             res.status(500).send(error);
         }
