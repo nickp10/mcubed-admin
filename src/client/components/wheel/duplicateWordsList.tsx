@@ -2,7 +2,6 @@ import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
-import SortHeader, * as sorting from "../sorting";
 
 export interface DuplicateWordsListProps {
 }
@@ -28,7 +27,7 @@ export default class DuplicateWordsListComponent extends Component<DuplicateWord
             const res1 = await fetch("/wheel/categories/list/json");
             const categories = await res1.json();
             const res2 = await fetch("/wheel/words/list/json");
-            const words = await res2.json();
+            const words: IWheelWord[] = await res2.json();
             this.setState((previousState, props) => {
                 return {
                     categories: categories,

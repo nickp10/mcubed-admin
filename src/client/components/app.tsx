@@ -4,6 +4,7 @@ import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
 import AlternateNamesListComponent from "./lineup/alternateNamesList";
 import DuplicateWordsListComponent from "./wheel/duplicateWordsList";
 import MissingNamesListComponent from "./lineup/missingNamesList";
+import UnverifiedWordsListComponent from "./wheel/unverifiedWordsList";
 import * as React from "react";
 import * as styles from "./app.css";
 
@@ -88,6 +89,7 @@ export default class App extends Component<AppProps, AppState> {
                                     <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
                                     <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
                                     <Route path="/wheel/duplicates/list" component={DuplicateWordsListComponent} />
+                                    <Route path="/wheel/unverified/list" component={UnverifiedWordsListComponent} />
                                 </Switch>
                             </div>
                             <div className={styles.copyrightDiv}>
