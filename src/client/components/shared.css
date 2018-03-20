@@ -42,3 +42,8 @@
 :local(.w75) {
     width: 75%;
 }
+
+:local(.error) {
+    color: red;
+    font-weight: bold;
+}

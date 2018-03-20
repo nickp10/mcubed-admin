@@ -30,7 +30,13 @@ function compareValues(val1: any, val2: any): number {
     return 0;
 }
 
-export default function SortHeader({ display, propertyName, context, onClick, state, ...rest }) {
+function sortHeaderOnClick(onSort: (propertyName: string, shouldBeAscending: boolean) => void, propertyName: string, shouldBeAscending: boolean): void {
+    if (onSort) {
+        onSort(propertyName, shouldBeAscending);
+    }
+}
+
+export default function SortHeader({ display, propertyName, onSort, state, ...rest }) {
     const isSorting = state.sortProperty === propertyName;
     const currentDirection = isSorting ? (state.sortAscending ? "&uarr;" : "&darr;") : "";
     const shouldBeAscending = !isSorting || !state.sortAscending;
@@ -38,6 +44,6 @@ export default function SortHeader({ display, propertyName, context, onClick, st
         __html: `${display} ${currentDirection}`
     };
     return (
-        <a className={sharedStyles.link} onClick={onClick.bind(context, propertyName, shouldBeAscending)} dangerouslySetInnerHTML={displayHtml} />
+        <a className={sharedStyles.link} onClick={sortHeaderOnClick.bind(undefined, onSort, propertyName, shouldBeAscending)} dangerouslySetInnerHTML={displayHtml} />
     );
 };

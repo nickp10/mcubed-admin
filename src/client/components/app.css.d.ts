@@ -16,3 +16,4 @@ export const navigationTable: string;
 export const navigationItem: string;
 export const active: string;
 export const copyrightDiv: string;
+export const error: string;

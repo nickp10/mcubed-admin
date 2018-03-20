@@ -45,6 +45,21 @@ export default class Persistence {
         return undefined;
     }
 
+    async deleteMissingNames(): Promise<void> {
+        if (!this.isValid) {
+            return undefined;
+        }
+        try {
+            await this.sendRequest({
+                path: `/lineupmissingnames`,
+                method: "DELETE"
+            });
+        } catch (error) {
+            log.error(error);
+        }
+        return undefined;
+    }
+
     async getAlternateName(id: string): Promise<IAlternateName> {
         if (!this.isValid || !id) {
             return undefined;

@@ -2,6 +2,7 @@ import { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
 import AlternateNamesListComponent from "./lineup/alternateNamesList";
+import MissingNamesListComponent from "./lineup/missingNamesList";
 import * as React from "react";
 import * as styles from "./app.css";
 
@@ -30,14 +31,19 @@ export default class App extends Component<AppProps, AppState> {
         }
     }
 
+    navigationItemOnClick(to: string, event: React.MouseEvent<HTMLElement>): void {
+        window.location.href = to;
+        event.preventDefault();
+    }
+
     render() {
         const { error } = this.state;
         if (error) {
-            return (<div>{error}</div>);
+            return (<div className={styles.error}>{error}</div>);
         } else {
             const NavigationItem = ({ match, to, text, ...rest }) => (
                 <Route path={match} children={(routeProps) => (
-                    <td className={`${styles.navigationItem} ${routeProps.match ? styles.active : ''}`}>
+                    <td className={`${styles.navigationItem} ${routeProps.match ? styles.active : ''}`} onClick={this.navigationItemOnClick.bind(this, to)}>
                         <a href={to}>{text}</a>
                     </td>
                 )} />
@@ -79,6 +85,7 @@ export default class App extends Component<AppProps, AppState> {
                                 <Switch>
                                     <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
                                     <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
+                                    <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
                                 </Switch>
                             </div>
                             <div className={styles.copyrightDiv}>

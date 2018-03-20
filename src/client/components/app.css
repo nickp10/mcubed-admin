@@ -172,3 +172,8 @@
     padding: 5px;
     text-align: center;
 }
+
+:local(.error) {
+    color: red;
+    font-weight: bold;
+}

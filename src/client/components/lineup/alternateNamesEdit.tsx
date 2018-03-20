@@ -69,7 +69,7 @@ export default class AlternateNamesEditComponent extends Component<AlternateName
     render() {
         const { alternateName, error, isLoaded } = this.state;
         if (error) {
-            return (<div>{error}</div>);
+            return (<div className={sharedStyles.error}>{error}</div>);
         } else if (!isLoaded) {
             return (<div>Loading...</div>);
         } else {

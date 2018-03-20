@@ -26,6 +26,9 @@ export default class App {
         app.get("/lineup/alternateNames/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/lineup/alternateNames/list/json", async (req, res) => await this.getLineupAlternateNames(req, res));
         app.get("/lineup/alternateNames/get/json", async (req, res) => await this.getLineupAlternateName(req, res));
+        app.get("/lineup/missingNames/delete", async (req, res) => await this.deleteLineupMissingNames(req, res));
+        app.get("/lineup/missingNames/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/lineup/missingNames/list/json", async (req, res) => await this.getLineupMissingNames(req, res));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
         });
@@ -34,24 +37,6 @@ export default class App {
     async serveReactClientApp(req: express.Request, res: express.Response): Promise<void> {
         const reactClient = path.join(__dirname, "index.html");
         res.sendFile(reactClient);
-    }
-
-    async getLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
-        try {
-            const alternateName = await this.persistence.getAlternateName(req.query.id);
-            res.status(200).send(alternateName);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-
-    async getLineupAlternateNames(req: express.Request, res: express.Response): Promise<void> {
-        try {
-            const alternateNames = await this.persistence.getAlternateNames();
-            res.status(200).send(alternateNames);
-        } catch (error) {
-            res.status(500).send(error);
-        }
     }
 
     async editLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
@@ -78,6 +63,47 @@ export default class App {
             const { id } = req.query;
             await this.persistence.deleteAlternateName(id);
             res.redirect("/lineup/alternateNames/list");
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const alternateName = await this.persistence.getAlternateName(req.query.id);
+            res.status(200).send(alternateName);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getLineupAlternateNames(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const alternateNames = await this.persistence.getAlternateNames();
+            res.status(200).send(alternateNames);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async deleteLineupMissingNames(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const { id } = req.query;
+            if (id) {
+                await this.persistence.deleteMissingName(id);
+            } else {
+                await this.persistence.deleteMissingNames();
+            }
+            res.redirect("/lineup/missingNames/list");
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getLineupMissingNames(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const missingNames = await this.persistence.getMissingNames();
+            res.status(200).send(missingNames);
         } catch (error) {
             res.status(500).send(error);
         }

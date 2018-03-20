@@ -34,7 +34,7 @@ export default class AlternateNamesListComponent extends Component<AlternateName
         };
     }
 
-    sortAlternateNames(sortProperty: string, sortAscending: boolean) {
+    sortAlternateNames(sortProperty: string, sortAscending: boolean): void {
         this.setState((previousState, props) => {
             return {
                 alternateNames: previousState.alternateNames,
@@ -67,16 +67,16 @@ export default class AlternateNamesListComponent extends Component<AlternateName
     render() {
         const { alternateNames, error, isLoaded } = this.state;
         if (error) {
-            return (<div>{error}</div>);
+            return (<div className={sharedStyles.error}>{error}</div>);
         } else if (!isLoaded) {
             return (<div>Loading...</div>);
         } else {
             return (
                 <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                     <tr>
-                        <th className={sharedStyles.center}><SortHeader propertyName="externalName" display="External Name" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
-                        <th className={sharedStyles.center}><SortHeader propertyName="contestName" display="Contest Name" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
-                        <th className={sharedStyles.center}><SortHeader propertyName="lastUsedDate" display="Last Used Date" state={this.state} context={this} onClick={this.sortAlternateNames} /></th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="externalName" display="External Name" state={this.state} onSort={this.sortAlternateNames.bind(this)} /></th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="contestName" display="Contest Name" state={this.state} onSort={this.sortAlternateNames.bind(this)} /></th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="lastUsedDate" display="Last Used Date" state={this.state} onSort={this.sortAlternateNames.bind(this)} /></th>
                         <th className={sharedStyles.center}>Actions</th>
                     </tr>
                     {alternateNames.sort((a, b) => sorting.compareObjects(a, b, this.state)).map(alternateName => (
