@@ -19,3 +19,15 @@ export interface IMissingName {
     sport?: Sport;
     team?: string;
 }
+
+export interface IWheelCategory {
+    id?: string;
+    name?: string;
+}
+
+export interface IWheelWord {
+    approved?: boolean;
+    id?: string;
+    categoryID?: string;
+    word?: string;
+}

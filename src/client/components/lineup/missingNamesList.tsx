@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { IMissingName, Sport } from "../../../interfaces";
-import * as moment from "moment";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";

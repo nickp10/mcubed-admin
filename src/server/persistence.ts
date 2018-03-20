@@ -1,5 +1,4 @@
-import { IMissingName, IAlternateName, Sport } from "../interfaces";
-
+import { IAlternateName, IMissingName, IWheelCategory, IWheelWord, Sport } from "../interfaces";
 import * as http from "http";
 import * as querystring from "querystring";
 import log from "./log";
@@ -12,46 +11,72 @@ export default class Persistence {
     }
 
     async getMissingNames(): Promise<IMissingName[]> {
-        if (!this.isValid) {
-            return undefined;
-        }
-        try {
-            const response = await this.sendRequest({
-                path: "/lineupmissingnames",
-                method: "GET"
-            });
-            const missingNames: IMissingName[] = JSON.parse(response);
-            if (Array.isArray(missingNames)) {
-                return missingNames;
-            }
-        } catch (error) {
-            log.error(error);
-        }
-        return undefined;
+        return await this.getAll<IMissingName>("lineupmissingnames");
     }
 
     async deleteMissingName(id: string): Promise<void> {
-        if (!this.isValid || !id) {
-            return undefined;
-        }
-        try {
-            await this.sendRequest({
-                path: `/lineupmissingnames/${id}`,
-                method: "DELETE"
-            });
-        } catch (error) {
-            log.error(error);
-        }
-        return undefined;
+        return await this.deleteSingle("lineupmissingnames", id);
     }
 
     async deleteMissingNames(): Promise<void> {
+        return await this.deleteAll("lineupmissingnames");
+    }
+
+    async getAlternateName(id: string): Promise<IAlternateName> {
+        return await this.getSingle<IAlternateName>("lineupalternatenames", id);
+    }
+
+    async getAlternateNames(): Promise<IAlternateName[]> {
+        return await this.getAll<IAlternateName>("lineupalternatenames");
+    }
+
+    async postAlternateName(alternateName: IAlternateName): Promise<IAlternateName> {
+        return await this.postSingle("lineupalternatenames", alternateName);
+    }
+
+    async putAlternateName(alternateName: IAlternateName): Promise<void> {
+        return await this.putSingle("lineupalternatenames", alternateName);
+    }
+
+    async deleteAlternateName(id: string): Promise<void> {
+        return await this.deleteSingle("lineupalternatenames", id);
+    }
+
+    async getWheelCategory(id: string): Promise<IWheelCategory> {
+        return await this.getSingle<IWheelCategory>("wheelcategories", id);
+    }
+
+    async getWheelCategories(): Promise<IWheelCategory[]> {
+        return await this.getAll<IWheelCategory>("wheelcategories");
+    }
+
+    async putWheelCategory(wheelCategory: IWheelWord): Promise<void> {
+        return this.putSingle("wheelcategories", wheelCategory);
+    }
+
+    async getWheelWord(id: string): Promise<IWheelWord> {
+        return await this.getSingle<IWheelWord>("wheelwords", id);
+    }
+
+    async getWheelWords(): Promise<IWheelWord[]> {
+        return await this.getAll<IWheelWord>("wheelwords");
+    }
+
+    async putWheelWord(wheelWord: IWheelWord): Promise<void> {
+        return await this.putSingle("wheelwords", wheelWord);
+    }
+
+    async deleteWheelWord(id: string): Promise<void> {
+        return await this.deleteSingle("wheelwords", id);
+    }
+
+    async deleteAll(table: string): Promise<void> {
         if (!this.isValid) {
             return undefined;
         }
         try {
             await this.sendRequest({
-                path: `/lineupmissingnames`,
+                path: `/${table}`,
                 method: "DELETE"
             });
         } catch (error) {
@@ -60,34 +85,33 @@ export default class Persistence {
         return undefined;
     }
 
-    async getAlternateName(id: string): Promise<IAlternateName> {
+    async deleteSingle(table: string, id: string): Promise<void> {
         if (!this.isValid || !id) {
             return undefined;
         }
         try {
-            const response = await this.sendRequest({
-                path: `/lineupalternatenames/${id}`,
-                method: "GET"
+            await this.sendRequest({
+                path: `/${table}/${id}`,
+                method: "DELETE"
             });
-            return JSON.parse(response);
         } catch (error) {
             log.error(error);
         }
         return undefined;
     }
 
-    async getAlternateNames(): Promise<IAlternateName[]> {
+    async getAll<T>(table: string): Promise<T[]> {
         if (!this.isValid) {
             return undefined;
         }
         try {
             const response = await this.sendRequest({
-                path: "/lineupalternatenames",
+                path: `/${table}`,
                 method: "GET"
             });
-            const alternateNames: IAlternateName[] = JSON.parse(response);
-            if (Array.isArray(alternateNames)) {
-                return alternateNames;
+            const items: T[] = JSON.parse(response);
+            if (Array.isArray(items)) {
+                return items;
             }
         } catch (error) {
             log.error(error);
@@ -95,15 +119,15 @@ export default class Persistence {
         return undefined;
     }
 
-    async postAlternateName(alternateName: IAlternateName): Promise<IAlternateName> {
-        if (!this.isValid || !alternateName || alternateName.id) {
+    async getSingle<T>(table: string, id: string): Promise<T> {
+        if (!this.isValid || !id) {
             return undefined;
         }
         try {
             const response = await this.sendRequest({
-                path: `/lineupalternatenames`,
-                method: "POST"
-            }, JSON.stringify(alternateName));
+                path: `/${table}/${id}`,
+                method: "GET"
+            });
             return JSON.parse(response);
         } catch (error) {
             log.error(error);
@@ -111,30 +135,31 @@ export default class Persistence {
         return undefined;
     }
 
-    async putAlternateName(alternateName: IAlternateName): Promise<void> {
-        if (!this.isValid || !alternateName || !alternateName.id) {
-            return undefined;
+    async postSingle<T extends { id?: string }>(table: string, item: T): Promise<T> {
+        if (!this.isValid || !item || item.id) {
+            return item;
         }
         try {
-            await this.sendRequest({
-                path: `/lineupalternatenames/${alternateName.id}`,
-                method: "PUT"
-            }, JSON.stringify(alternateName));
+            const response = await this.sendRequest({
+                path: `/${table}`,
+                method: "POST"
+            }, JSON.stringify(item));
+            return JSON.parse(response);
         } catch (error) {
             log.error(error);
         }
-        return undefined;
+        return item;
     }
 
-    async deleteAlternateName(id: string): Promise<void> {
-        if (!this.isValid || !id) {
+    async putSingle<T extends { id?: string }>(table: string, item: T): Promise<void> {
+        if (!this.isValid || !item || !item.id) {
             return undefined;
         }
         try {
             await this.sendRequest({
-                path: `/lineupalternatenames/${id}`,
-                method: "DELETE"
-            });
+                path: `/${table}/${item.id}`,
+                method: "PUT"
+            }, JSON.stringify(item));
         } catch (error) {
             log.error(error);
         }

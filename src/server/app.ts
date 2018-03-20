@@ -29,6 +29,12 @@ export default class App {
         app.get("/lineup/missingNames/delete", async (req, res) => await this.deleteLineupMissingNames(req, res));
         app.get("/lineup/missingNames/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/lineup/missingNames/list/json", async (req, res) => await this.getLineupMissingNames(req, res));
+        app.get("/wheel/categories/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/wheel/categories/list/json", async (req, res) => await this.getWheelCategories(req, res));
+        app.get("/wheel/duplicates/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/wheel/words/list/json", async (req, res) => await this.getWheelWords(req, res));
+        app.get("/wheel/words/delete", async (req, res) => await this.deleteWheelWord(req, res));
+        app.get("/wheel/words/edit", async (req, res) => await this.serveReactClientApp(req, res));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
         });
@@ -60,8 +66,7 @@ export default class App {
 
     async deleteLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
         try {
-            const { id } = req.query;
-            await this.persistence.deleteAlternateName(id);
+            await this.persistence.deleteAlternateName(req.query.id);
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
             res.status(500).send(error);
@@ -104,6 +109,42 @@ export default class App {
         try {
             const missingNames = await this.persistence.getMissingNames();
             res.status(200).send(missingNames);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getWheelCategories(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const wheelCategories = await this.persistence.getWheelCategories();
+            res.status(200).send(wheelCategories);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getWheelWords(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const wheelWords = await this.persistence.getWheelWords();
+            res.status(200).send(wheelWords);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async getWheelWord(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const wheelWord = await this.persistence.getWheelWord(req.query.id);
+            res.status(200).send(wheelWord);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async deleteWheelWord(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            await this.persistence.deleteWheelWord(req.query.id);
+            res.redirect("/wheel/duplicates/list");
         } catch (error) {
             res.status(500).send(error);
         }
