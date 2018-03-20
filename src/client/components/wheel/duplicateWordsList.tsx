@@ -3,6 +3,7 @@ import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
+import SortHeader, * as sorting from "../sorting";
 
 export interface DuplicateWordsListProps {
 }
@@ -12,6 +13,8 @@ export interface DuplicateWordsListState {
     isLoaded?: boolean;
     categories?: IWheelCategory[];
     duplicateWords?: IWheelWord[];
+    sortAscending?: boolean;
+    sortProperty?: string;
 }
 
 export default class DuplicateWordsListComponent extends Component<RouteComponentProps<DuplicateWordsListProps>, DuplicateWordsListState> {
@@ -19,8 +22,21 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
         super(props, context);
         this.state = {
             categories: [],
-            duplicateWords: []
+            duplicateWords: [],
+            sortAscending: true,
+            sortProperty: "word"
         };
+    }
+
+    sortWords(sortProperty: string, sortAscending: boolean): void {
+        this.setState((previousState, props) => {
+            return {
+                duplicateWords: previousState.duplicateWords,
+                sortAscending: sortAscending,
+                sortProperty: sortProperty,
+                isLoaded: previousState.isLoaded
+            };
+        });
     }
 
     async componentDidMount() {
@@ -33,6 +49,8 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
                 return {
                     categories: categories,
                     duplicateWords: this.filterDuplicates(words),
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
                     isLoaded: true
                 };
             });
@@ -51,6 +69,8 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
                     return {
                         categories: previousState.categories,
                         duplicateWords: previousState.duplicateWords.filter(w => w.word !== word.word),
+                        sortAscending: previousState.sortAscending,
+                        sortProperty: previousState.sortProperty,
                         isLoaded: true
                     };
                 });
@@ -101,16 +121,16 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
             return (
                 <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                     <tr>
-                        <th className={sharedStyles.center}>Word</th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="word" display="Word" state={this.state} onSort={this.sortWords.bind(this)} /></th>
                         <th className={sharedStyles.center}>Category</th>
                         <th className={sharedStyles.center}>Actions</th>
                     </tr>
-                    {duplicateWords.map(duplicateWord => (
+                    {duplicateWords.sort((a, b) => sorting.compareObjects(a, b, this.state)).map(duplicateWord => (
                         <tr className={sharedStyles.highlight}>
                             <td>{duplicateWord.word || "N/A"}</td>
                             <td>{this.formatCategoryName(duplicateWord.categoryID) || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={"/wheel/words/edit?id=" + duplicateWord.id}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${duplicateWord.categoryID}/words/edit?id=${duplicateWord.id}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, duplicateWord)}>Delete</a>
                             </td>
                         </tr>

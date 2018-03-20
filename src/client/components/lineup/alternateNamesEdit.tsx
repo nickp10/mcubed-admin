@@ -11,7 +11,7 @@ export interface AlternateNamesEditProps {
 
 export interface AlternateNamesEditState {
     alternateName?: IAlternateName;
-    alternateNameId?: string;
+    alternateNameID?: string;
     externalName?: string;
     error?: string;
     isLoaded?: boolean;
@@ -23,7 +23,7 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
         const search = this.props.location.search;
         const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);
         this.state = {
-            alternateNameId: this.getQueryStringValue(query, "id"),
+            alternateNameID: this.getQueryStringValue(query, "id"),
             externalName: this.getQueryStringValue(query, "externalName")
         };
     }
@@ -37,7 +37,7 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
         this.setState((previousState, props) => {
             return {
                 alternateName: alternateName,
-                alternateNameId: previousState.alternateNameId,
+                alternateNameID: previousState.alternateNameID,
                 externalName: previousState.externalName,
                 isLoaded: true
             };
@@ -46,8 +46,8 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
 
     async componentDidMount() {
         try {
-            if (this.state.alternateNameId) {
-                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.state.alternateNameId}`);
+            if (this.state.alternateNameID) {
+                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.state.alternateNameID}`);
                 const alternateName = await res.json();
                 this.useAlternateName(alternateName);
             } else {
@@ -58,7 +58,7 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
         } catch (error) {
             this.setState((previousState, props) => {
                 return {
-                    alternateNameId: previousState.alternateNameId,
+                    alternateNameID: previousState.alternateNameID,
                     externalName: previousState.externalName,
                     error: error.message
                 };

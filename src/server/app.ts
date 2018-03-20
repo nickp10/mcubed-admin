@@ -1,3 +1,4 @@
+import { IAlternateName, IWheelCategory, IWheelWord } from "../interfaces";
 import args from "./args";
 import * as bodyParser from "body-parser";
 import * as express from "express";
@@ -5,7 +6,6 @@ import log from "./log";
 import * as path from "path";
 import * as process from "process";
 import Persistence from "./persistence";
-import { IAlternateName } from "../interfaces";
 
 export default class App {
     persistence: Persistence;
@@ -29,17 +29,21 @@ export default class App {
         app.get("/lineup/missingNames/delete", async (req, res) => await this.deleteLineupMissingNames(req, res));
         app.get("/lineup/missingNames/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/lineup/missingNames/list/json", async (req, res) => await this.getLineupMissingNames(req, res));
-        app.get("/wheel/categories/:id/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/wheel/categories/:categoryID/list", async (req, res) => await this.serveReactClientApp(req, res));
+        app.get("/wheel/categories/:categoryID/words/edit", async (req, res) => await this.serveReactClientApp(req, res));
+        app.post("/wheel/categories/:categoryID/words/edit", async (req, res) => await this.editWheelWord(req, res));
         app.get("/wheel/categories/delete/json", async (req, res) => await this.deleteWheelCategory(req, res));
         app.get("/wheel/categories/edit", async (req, res) => await this.serveReactClientApp(req, res));
+        app.post("/wheel/categories/edit", async (req, res) => await this.editWheelCategory(req, res));
         app.get("/wheel/categories/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/wheel/categories/list/json", async (req, res) => await this.getWheelCategories(req, res));
+        app.get("/wheel/categories/get/json", async (req, res) => await this.getWheelCategory(req, res));
         app.get("/wheel/duplicates/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.get("/wheel/unverified/list", async (req, res) => await this.serveReactClientApp(req, res));
         app.post("/wheel/words/approveMany/json", async (req, res) => await this.approveManyWheelWords(req, res));
         app.get("/wheel/words/list/json", async (req, res) => await this.getWheelWords(req, res));
+        app.get("/wheel/words/get/json", async (req, res) => await this.getWheelWord(req, res));
         app.get("/wheel/words/delete/json", async (req, res) => await this.deleteWheelWord(req, res));
-        app.get("/wheel/words/edit", async (req, res) => await this.serveReactClientApp(req, res));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
         });
@@ -128,10 +132,37 @@ export default class App {
         }
     }
 
+    async getWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const wheelCategory = await this.persistence.getWheelCategory(req.query.id);
+            res.status(200).send(wheelCategory);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
     async deleteWheelCategory(req: express.Request, res: express.Response): Promise<void> {
         try {
             await this.persistence.deleteWheelCategory(req.query.id);
             res.sendStatus(200);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
+    async editWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const { id, name } = req.body;
+            const wheelCategory: IWheelCategory = {
+                id: id,
+                name: name
+            };
+            if (wheelCategory.id) {
+                await this.persistence.putWheelCategory(wheelCategory);
+            } else {
+                await this.persistence.postWheelCategory(wheelCategory);
+            }
+            res.redirect("/wheel/categories/list");
         } catch (error) {
             res.status(500).send(error);
         }
@@ -164,14 +195,35 @@ export default class App {
         }
     }
 
+    async editWheelWord(req: express.Request, res: express.Response): Promise<void> {
+        try {
+            const { categoryID } = req.params;
+            const { id, word } = req.body;
+            const wheelWord: IWheelWord = {
+                id: id,
+                categoryID: categoryID,
+                word: word
+            };
+            if (wheelWord.id) {
+                await this.persistence.putWheelWord(wheelWord);
+            } else {
+                wheelWord.approved = false;
+                await this.persistence.postWheelWord(wheelWord);
+            }
+            res.redirect(`/wheel/categories/${categoryID}/list`);
+        } catch (error) {
+            res.status(500).send(error);
+        }
+    }
+
     async approveManyWheelWords(req: express.Request, res: express.Response): Promise<void> {
         try {
             const { ids } = req.body;
-            const wordIds = ids.split(",");
-            for (const wordId of wordIds) {
+            const wordIDs = ids.split(",");
+            for (const wordID of wordIDs) {
                 await this.persistence.putWheelWord({
                     approved: true,
-                    id: wordId
+                    id: wordID
                 });
             }
             res.sendStatus(200);

@@ -98,7 +98,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                         <tr className={sharedStyles.highlight}>
                             <td>{word.word || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={"/wheel/words/edit?id=" + word.id}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${word.categoryID}/words/edit?id=${word.id}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, word)}>Delete</a>
                             </td>
                         </tr>
@@ -110,7 +110,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                     }
                     <tr>
                         <th colSpan={2} className={sharedStyles.center}>
-                            <a className={sharedStyles.link} href="/wheel/words/edit">Add</a>
+                            <a className={sharedStyles.link} href={`/wheel/categories/${this.props.match.params.categoryID}/words/edit`}>Add</a>
                         </th>
                     </tr>
                 </table>

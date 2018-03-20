@@ -20,7 +20,9 @@ export default class MissingNamesListComponent extends Component<RouteComponentP
     constructor(props: RouteComponentProps<MissingNamesListProps>, context?: any) {
         super(props, context);
         this.state = {
-            missingNames: []
+            missingNames: [],
+            sortAscending: true,
+            sortProperty: "name"
         };
     }
 

@@ -54,8 +54,12 @@ export default class Persistence {
         return await this.deleteSingle("wheelcategories", id);
     }
 
+    async postWheelCategory(wheelCategory: IWheelWord): Promise<IWheelCategory> {
+        return await this.postSingle("wheelcategories", wheelCategory);
+    }
+
     async putWheelCategory(wheelCategory: IWheelWord): Promise<void> {
-        return this.putSingle("wheelcategories", wheelCategory);
+        return await this.putSingle("wheelcategories", wheelCategory);
     }
 
     async getWheelWord(id: string): Promise<IWheelWord> {
@@ -64,6 +68,10 @@ export default class Persistence {
 
     async getWheelWords(): Promise<IWheelWord[]> {
         return await this.getAll<IWheelWord>("wheelwords");
+    }
+
+    async postWheelWord(wheelWord: IWheelWord): Promise<IWheelCategory> {
+        return await this.postSingle("wheelwords", wheelWord);
     }
 
     async putWheelWord(wheelWord: IWheelWord): Promise<void> {

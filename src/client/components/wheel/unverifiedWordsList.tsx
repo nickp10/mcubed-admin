@@ -3,6 +3,7 @@ import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
+import SortHeader, * as sorting from "../sorting";
 
 export interface UnverifiedWordsListProps {
 }
@@ -12,6 +13,8 @@ export interface UnverifiedWordsListState {
     isLoaded?: boolean;
     categories?: IWheelCategory[];
     unverifiedWords?: IWheelWord[];
+    sortAscending?: boolean;
+    sortProperty?: string;
 }
 
 export default class UnverifiedWordsListComponent extends Component<RouteComponentProps<UnverifiedWordsListProps>, UnverifiedWordsListState> {
@@ -19,8 +22,21 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
         super(props, context);
         this.state = {
             categories: [],
-            unverifiedWords: []
+            unverifiedWords: [],
+            sortAscending: true,
+            sortProperty: "word"
         };
+    }
+
+    sortWords(sortProperty: string, sortAscending: boolean): void {
+        this.setState((previousState, props) => {
+            return {
+                unverifiedWords: previousState.unverifiedWords,
+                sortAscending: sortAscending,
+                sortProperty: sortProperty,
+                isLoaded: previousState.isLoaded
+            };
+        });
     }
 
     async componentDidMount() {
@@ -33,6 +49,8 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                 return {
                     categories: categories,
                     unverifiedWords: words.filter(w => !w.approved),
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
                     isLoaded: true
                 };
             });
@@ -49,6 +67,8 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                 return {
                     categories: previousState.categories,
                     unverifiedWords: previousState.unverifiedWords,
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
                     isLoaded: false
                 };
             });
@@ -67,6 +87,8 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                     return {
                         categories: previousState.categories,
                         unverifiedWords: words.filter(w => !w.approved),
+                        sortAscending: previousState.sortAscending,
+                        sortProperty: previousState.sortProperty,
                         isLoaded: true
                     };
                 });
@@ -90,6 +112,8 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                     return {
                         categories: previousState.categories,
                         unverifiedWords: previousState.unverifiedWords.filter(w => w.id !== word.id),
+                        sortAscending: previousState.sortAscending,
+                        sortProperty: previousState.sortProperty,
                         isLoaded: true
                     };
                 });
@@ -120,16 +144,16 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
             return (
                 <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                     <tr>
-                        <th className={sharedStyles.center}>Word</th>
+                        <th className={sharedStyles.center}><SortHeader propertyName="word" display="Word" state={this.state} onSort={this.sortWords.bind(this)} /></th>
                         <th className={sharedStyles.center}>Category</th>
                         <th className={sharedStyles.center}>Actions</th>
                     </tr>
-                    {unverifiedWords.map(unverifiedWord => (
+                    {unverifiedWords.sort((a, b) => sorting.compareObjects(a, b, this.state)).map(unverifiedWord => (
                         <tr className={sharedStyles.highlight}>
                             <td>{unverifiedWord.word || "N/A"}</td>
                             <td>{this.formatCategoryName(unverifiedWord.categoryID) || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={"/wheel/words/edit?id=" + unverifiedWord.id}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${unverifiedWord.categoryID}/words/edit?id=${unverifiedWord.id}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, unverifiedWord)}>Delete</a>
                             </td>
                         </tr>

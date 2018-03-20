@@ -21,7 +21,9 @@ export default class AlternateNamesListComponent extends Component<RouteComponen
     constructor(props: RouteComponentProps<AlternateNamesListProps>, context?: any) {
         super(props, context);
         this.state = {
-            alternateNames: []
+            alternateNames: [],
+            sortAscending: true,
+            sortProperty: "externalName"
         };
     }
 

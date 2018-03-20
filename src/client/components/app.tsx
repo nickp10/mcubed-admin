@@ -2,11 +2,13 @@ import { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
 import AlternateNamesListComponent from "./lineup/alternateNamesList";
+import CategoryEditComponent from "./wheel/categoryEdit";
 import CategoriesListComponent from "./wheel/categoriesList";
 import CategoryWordListComponent from "./wheel/categoryWordList";
 import DuplicateWordsListComponent from "./wheel/duplicateWordsList";
 import MissingNamesListComponent from "./lineup/missingNamesList";
 import UnverifiedWordsListComponent from "./wheel/unverifiedWordsList";
+import WordEditComponent from "./wheel/wordEdit";
 import * as React from "react";
 import * as styles from "./app.css";
 
@@ -90,8 +92,10 @@ export default class App extends Component<AppProps, AppState> {
                                     <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
                                     <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
                                     <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
+                                    <Route path="/wheel/categories/edit" component={CategoryEditComponent} />
                                     <Route path="/wheel/categories/list" component={CategoriesListComponent} />
                                     <Route path="/wheel/categories/:categoryID/list" component={CategoryWordListComponent} />
+                                    <Route path="/wheel/categories/:categoryID/words/edit" component={WordEditComponent} />
                                     <Route path="/wheel/duplicates/list" component={DuplicateWordsListComponent} />
                                     <Route path="/wheel/unverified/list" component={UnverifiedWordsListComponent} />
                                 </Switch>
