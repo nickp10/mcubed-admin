@@ -39,7 +39,13 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async componentDidMount() {
         try {
-            const res = await fetch("/wheel/categories/list/json");
+            const res = await fetch("/wheel/categories/list/json", {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
+            }
             const categories = await res.json();
             this.setState((previousState, props) => {
                 return {
@@ -58,21 +64,21 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async deleteCategory(category: IWheelCategory): Promise<void> {
         try {
-            const res = await fetch(`/wheel/categories/delete/json?id=${category.id}`);
-            if (res.status === 200) {
-                this.setState((previousState, props) => {
-                    return {
-                        categories: previousState.categories.filter(c => c.id !== category.id),
-                        sortAscending: previousState.sortAscending,
-                        sortProperty: previousState.sortProperty,
-                        isLoaded: true
-                    };
-                });
-            } else {
-                this.setState({
-                    error: `Could not delete the category: ${category.name}`
-                });
+            const res = await fetch(`/wheel/categories/delete/json?id=${category.id}`, {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
             }
+            this.setState((previousState, props) => {
+                return {
+                    categories: previousState.categories.filter(c => c.id !== category.id),
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
+                    isLoaded: true
+                };
+            });
         } catch (error) {
             this.setState({
                 error: error.message

@@ -93,8 +93,8 @@ export default class Persistence {
             });
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot delete all the records. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return undefined;
     }
 
     async deleteSingle(table: string, id: string): Promise<void> {
@@ -108,8 +108,8 @@ export default class Persistence {
             });
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot delete the specified record. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return undefined;
     }
 
     async getAll<T>(table: string): Promise<T[]> {
@@ -125,10 +125,11 @@ export default class Persistence {
             if (Array.isArray(items)) {
                 return items;
             }
+            return undefined;
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot read all the records. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return undefined;
     }
 
     async getSingle<T>(table: string, id: string): Promise<T> {
@@ -143,8 +144,8 @@ export default class Persistence {
             return JSON.parse(response);
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot read the record with the specified ID. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return undefined;
     }
 
     async postSingle<T extends { id?: string }>(table: string, item: T): Promise<T> {
@@ -159,8 +160,8 @@ export default class Persistence {
             return JSON.parse(response);
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot create the specified record. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return item;
     }
 
     async putSingle<T extends { id?: string }>(table: string, item: T): Promise<void> {
@@ -174,8 +175,8 @@ export default class Persistence {
             }, JSON.stringify(item));
         } catch (error) {
             log.error(error);
+            throw new Error("Cannot update the specified record. Ensure the database is running and the correct database parameters have been specified.");
         }
-        return undefined;
     }
 
     async sendRequest(request: http.RequestOptions, data?: string): Promise<string> {

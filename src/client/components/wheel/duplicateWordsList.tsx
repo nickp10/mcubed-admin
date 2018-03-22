@@ -41,9 +41,21 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
 
     async componentDidMount() {
         try {
-            const res1 = await fetch("/wheel/categories/list/json");
+            const res1 = await fetch("/wheel/categories/list/json", {
+                credentials: "same-origin"
+            });
+            if (res1.status !== 200) {
+                const error = await res1.json();
+                throw error;
+            }
             const categories = await res1.json();
-            const res2 = await fetch("/wheel/words/list/json");
+            const res2 = await fetch("/wheel/words/list/json", {
+                credentials: "same-origin"
+            });
+            if (res2.status !== 200) {
+                const error = await res2.json();
+                throw error;
+            }
             const words: IWheelWord[] = await res2.json();
             this.setState((previousState, props) => {
                 return {
@@ -63,22 +75,22 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
 
     async deleteWord(word: IWheelWord): Promise<void> {
         try {
-            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`);
-            if (res.status === 200) {
-                this.setState((previousState, props) => {
-                    return {
-                        categories: previousState.categories,
-                        duplicateWords: previousState.duplicateWords.filter(w => w.word !== word.word),
-                        sortAscending: previousState.sortAscending,
-                        sortProperty: previousState.sortProperty,
-                        isLoaded: true
-                    };
-                });
-            } else {
-                this.setState({
-                    error: `Could not delete the word: ${word.word}`
-                });
+            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`, {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
             }
+            this.setState((previousState, props) => {
+                return {
+                    categories: previousState.categories,
+                    duplicateWords: previousState.duplicateWords.filter(w => w.word !== word.word),
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
+                    isLoaded: true
+                };
+            });
         } catch (error) {
             this.setState({
                 error: error.message

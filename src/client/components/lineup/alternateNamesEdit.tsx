@@ -47,7 +47,13 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
     async componentDidMount() {
         try {
             if (this.state.alternateNameID) {
-                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.state.alternateNameID}`);
+                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.state.alternateNameID}`, {
+                    credentials: "same-origin"
+                });
+                if (res.status !== 200) {
+                    const error = await res.json();
+                    throw error;
+                }
                 const alternateName = await res.json();
                 this.useAlternateName(alternateName);
             } else {

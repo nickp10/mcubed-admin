@@ -44,7 +44,13 @@ export default class WordEditComponent extends Component<RouteComponentProps<Wor
     async componentDidMount() {
         try {
             if (this.state.wordID) {
-                const res = await fetch(`/wheel/words/get/json?id=${this.state.wordID}`);
+                const res = await fetch(`/wheel/words/get/json?id=${this.state.wordID}`, {
+                    credentials: "same-origin"
+                });
+                if (res.status !== 200) {
+                    const error = await res.json();
+                    throw error;
+                }
                 const word = await res.json();
                 this.useWord(word);
             } else {

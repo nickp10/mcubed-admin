@@ -40,7 +40,13 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async componentDidMount() {
         try {
-            const res = await fetch(`/wheel/words/list/json`);
+            const res = await fetch(`/wheel/words/list/json`, {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
+            }
             const words: IWheelWord[] = await res.json();
             this.setState((previousState, props) => {
                 return {
@@ -59,21 +65,21 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async deleteWord(word: IWheelWord): Promise<void> {
         try {
-            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`);
-            if (res.status === 200) {
-                this.setState((previousState, props) => {
-                    return {
-                        words: previousState.words.filter(w => w.id !== word.id),
-                        sortAscending: previousState.sortAscending,
-                        sortProperty: previousState.sortProperty,
-                        isLoaded: true
-                    };
-                });
-            } else {
-                this.setState({
-                    error: `Could not delete the word: ${word.word}`
-                });
+            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`, {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
             }
+            this.setState((previousState, props) => {
+                return {
+                    words: previousState.words.filter(w => w.id !== word.id),
+                    sortAscending: previousState.sortAscending,
+                    sortProperty: previousState.sortProperty,
+                    isLoaded: true
+                };
+            });
         } catch (error) {
             this.setState({
                 error: error.message

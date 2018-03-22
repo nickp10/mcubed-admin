@@ -1,7 +1,9 @@
 import { IAlternateName, IWheelCategory, IWheelWord } from "../interfaces";
 import args from "./args";
 import * as bodyParser from "body-parser";
+import * as cookieParser from "cookie-parser";
 import * as express from "express";
+import * as jwt from "jwt-express";
 import log from "./log";
 import * as path from "path";
 import * as process from "process";
@@ -9,6 +11,8 @@ import Persistence from "./persistence";
 
 export default class App {
     persistence: Persistence;
+    static password = "test";
+    static secret = "Super-Secret";
 
     constructor() {
         this.persistence = new Persistence(args.persistenceServer, args.persistencePort, args.persistenceAppName, args.persistenceAppKey);
@@ -19,42 +23,78 @@ export default class App {
         app.use(bodyParser.urlencoded({
             extended: true
         }));
+        app.use(cookieParser());
+        app.use(jwt.init(App.secret));
+        app.get("/", async (req, res, next) => await this.serveHome(req, res, next));
         app.use(express.static(__dirname));
-        app.get("/lineup/alternateNames/delete", async (req, res) => await this.deleteLineupAlternateName(req, res));
-        app.get("/lineup/alternateNames/edit", async (req, res) => await this.serveReactClientApp(req, res));
-        app.post("/lineup/alternateNames/edit", async (req, res) => await this.editLineupAlternateName(req, res));
-        app.get("/lineup/alternateNames/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.get("/lineup/alternateNames/list/json", async (req, res) => await this.getLineupAlternateNames(req, res));
-        app.get("/lineup/alternateNames/get/json", async (req, res) => await this.getLineupAlternateName(req, res));
-        app.get("/lineup/missingNames/delete", async (req, res) => await this.deleteLineupMissingNames(req, res));
-        app.get("/lineup/missingNames/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.get("/lineup/missingNames/list/json", async (req, res) => await this.getLineupMissingNames(req, res));
-        app.get("/wheel/categories/:categoryID/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.get("/wheel/categories/:categoryID/words/edit", async (req, res) => await this.serveReactClientApp(req, res));
-        app.post("/wheel/categories/:categoryID/words/edit", async (req, res) => await this.editWheelWord(req, res));
-        app.get("/wheel/categories/delete/json", async (req, res) => await this.deleteWheelCategory(req, res));
-        app.get("/wheel/categories/edit", async (req, res) => await this.serveReactClientApp(req, res));
-        app.post("/wheel/categories/edit", async (req, res) => await this.editWheelCategory(req, res));
-        app.get("/wheel/categories/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.get("/wheel/categories/list/json", async (req, res) => await this.getWheelCategories(req, res));
-        app.get("/wheel/categories/get/json", async (req, res) => await this.getWheelCategory(req, res));
-        app.get("/wheel/duplicates/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.get("/wheel/unverified/list", async (req, res) => await this.serveReactClientApp(req, res));
-        app.post("/wheel/words/approveMany/json", async (req, res) => await this.approveManyWheelWords(req, res));
-        app.get("/wheel/words/list/json", async (req, res) => await this.getWheelWords(req, res));
-        app.get("/wheel/words/get/json", async (req, res) => await this.getWheelWord(req, res));
-        app.get("/wheel/words/delete/json", async (req, res) => await this.deleteWheelWord(req, res));
+        app.get("/login", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/login/json", async (req, res, next) => await this.login(req, res, next));
+        app.get("/logout", async (req, res, next) => await this.logout(req, res, next));
+        app.get("/lineup/alternateNames/delete", async (req, res, next) => await this.deleteLineupAlternateName(req, res, next));
+        app.get("/lineup/alternateNames/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/lineup/alternateNames/edit", async (req, res, next) => await this.editLineupAlternateName(req, res, next));
+        app.get("/lineup/alternateNames/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/lineup/alternateNames/list/json", async (req, res, next) => await this.getLineupAlternateNames(req, res, next));
+        app.get("/lineup/alternateNames/get/json", async (req, res, next) => await this.getLineupAlternateName(req, res, next));
+        app.get("/lineup/missingNames/delete", async (req, res, next) => await this.deleteLineupMissingNames(req, res, next));
+        app.get("/lineup/missingNames/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/lineup/missingNames/list/json", async (req, res, next) => await this.getLineupMissingNames(req, res, next));
+        app.get("/wheel/categories/:categoryID/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/categories/:categoryID/words/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/categories/:categoryID/words/edit", async (req, res, next) => await this.editWheelWord(req, res, next));
+        app.get("/wheel/categories/delete/json", async (req, res, next) => await this.deleteWheelCategory(req, res, next));
+        app.get("/wheel/categories/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/categories/edit", async (req, res, next) => await this.editWheelCategory(req, res, next));
+        app.get("/wheel/categories/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/categories/list/json", async (req, res, next) => await this.getWheelCategories(req, res, next));
+        app.get("/wheel/categories/get/json", async (req, res, next) => await this.getWheelCategory(req, res, next));
+        app.get("/wheel/duplicates/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/unverified/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/words/approveMany/json", async (req, res, next) => await this.approveManyWheelWords(req, res, next));
+        app.get("/wheel/words/list/json", async (req, res, next) => await this.getWheelWords(req, res, next));
+        app.get("/wheel/words/get/json", async (req, res, next) => await this.getWheelWord(req, res, next));
+        app.get("/wheel/words/delete/json", async (req, res, next) => await this.deleteWheelWord(req, res, next));
+        app.use(async (err, req, res, next) => await this.handleError(err, req, res, next));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
         });
     }
 
-    async serveReactClientApp(req: express.Request, res: express.Response): Promise<void> {
+    async serveHome(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        const jwt = (<any>req).jwt;
+        if (jwt && jwt.valid && jwt.payload.isAdmin) {
+            res.redirect("/lineup/alternateNames/list");
+        } else {
+            res.redirect("/login");
+        }
+    }
+
+    async serveReactClientApp(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         const reactClient = path.join(__dirname, "index.html");
         res.sendFile(reactClient);
     }
 
-    async editLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
+    async login(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        try {
+            if (req.body.password === App.password) {
+                (<any>res).jwt({
+                    isAdmin: true
+                });
+                res.sendStatus(200);
+            } else {
+                throw { status: 401, message: "Unable to login" };
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async logout(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        jwt.clear();
+        res.redirect("/");
+    }
+
+    async editLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const { id, contestName, externalName } = req.body;
             const alternateName: IAlternateName = {
@@ -69,38 +109,38 @@ export default class App {
             }
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async deleteLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
+    async deleteLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             await this.persistence.deleteAlternateName(req.query.id);
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getLineupAlternateName(req: express.Request, res: express.Response): Promise<void> {
+    async getLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const alternateName = await this.persistence.getAlternateName(req.query.id);
             res.status(200).send(alternateName);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getLineupAlternateNames(req: express.Request, res: express.Response): Promise<void> {
+    async getLineupAlternateNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const alternateNames = await this.persistence.getAlternateNames();
             res.status(200).send(alternateNames);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async deleteLineupMissingNames(req: express.Request, res: express.Response): Promise<void> {
+    async deleteLineupMissingNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const { id } = req.query;
             if (id) {
@@ -110,47 +150,47 @@ export default class App {
             }
             res.redirect("/lineup/missingNames/list");
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getLineupMissingNames(req: express.Request, res: express.Response): Promise<void> {
+    async getLineupMissingNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const missingNames = await this.persistence.getMissingNames();
             res.status(200).send(missingNames);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getWheelCategories(req: express.Request, res: express.Response): Promise<void> {
+    async getWheelCategories(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const wheelCategories = await this.persistence.getWheelCategories();
             res.status(200).send(wheelCategories);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+    async getWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const wheelCategory = await this.persistence.getWheelCategory(req.query.id);
             res.status(200).send(wheelCategory);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async deleteWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+    async deleteWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             await this.persistence.deleteWheelCategory(req.query.id);
             res.sendStatus(200);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async editWheelCategory(req: express.Request, res: express.Response): Promise<void> {
+    async editWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const { id, name } = req.body;
             const wheelCategory: IWheelCategory = {
@@ -164,38 +204,38 @@ export default class App {
             }
             res.redirect("/wheel/categories/list");
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getWheelWords(req: express.Request, res: express.Response): Promise<void> {
+    async getWheelWords(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const wheelWords = await this.persistence.getWheelWords();
             res.status(200).send(wheelWords);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async getWheelWord(req: express.Request, res: express.Response): Promise<void> {
+    async getWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const wheelWord = await this.persistence.getWheelWord(req.query.id);
             res.status(200).send(wheelWord);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async deleteWheelWord(req: express.Request, res: express.Response): Promise<void> {
+    async deleteWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             await this.persistence.deleteWheelWord(req.query.id);
             res.sendStatus(200);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async editWheelWord(req: express.Request, res: express.Response): Promise<void> {
+    async editWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const { categoryID } = req.params;
             const { id, word } = req.body;
@@ -212,11 +252,11 @@ export default class App {
             }
             res.redirect(`/wheel/categories/${categoryID}/list`);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
     }
 
-    async approveManyWheelWords(req: express.Request, res: express.Response): Promise<void> {
+    async approveManyWheelWords(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const { ids } = req.body;
             const wordIDs = ids.split(",");
@@ -228,7 +268,23 @@ export default class App {
             }
             res.sendStatus(200);
         } catch (error) {
-            res.status(500).send(error);
+            next(error);
         }
+    }
+
+    async handleError(err: any, req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        if (typeof err.status === "number") {
+            res.status(err.status);
+        } else {
+            res.status(500);
+        }
+        if (typeof err === "string") {
+            err = { message: err };
+        } else if (err instanceof Error) {
+            err = { message: err.message };
+        } else if (typeof err.message === "string") {
+            err = { message: err.message };
+        }
+        res.json(err);
     }
 }

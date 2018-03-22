@@ -50,7 +50,13 @@ export default class AlternateNamesListComponent extends Component<RouteComponen
 
     async componentDidMount() {
         try {
-            const res = await fetch("/lineup/alternateNames/list/json");
+            const res = await fetch("/lineup/alternateNames/list/json", {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
+            }
             const alternateNames = await res.json();
             this.setState((previousState, props) => {
                 return {

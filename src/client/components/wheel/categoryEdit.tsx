@@ -43,7 +43,13 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
     async componentDidMount() {
         try {
             if (this.state.categoryID) {
-                const res = await fetch(`/wheel/categories/get/json?id=${this.state.categoryID}`);
+                const res = await fetch(`/wheel/categories/get/json?id=${this.state.categoryID}`, {
+                    credentials: "same-origin"
+                });
+                if (res.status !== 200) {
+                    const error = await res.json();
+                    throw error;
+                }
                 const category = await res.json();
                 this.useCategory(category);
             } else {

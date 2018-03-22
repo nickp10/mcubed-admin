@@ -39,7 +39,13 @@ export default class MissingNamesListComponent extends Component<RouteComponentP
 
     async componentDidMount() {
         try {
-            const res = await fetch("/lineup/missingNames/list/json");
+            const res = await fetch("/lineup/missingNames/list/json", {
+                credentials: "same-origin"
+            });
+            if (res.status !== 200) {
+                const error = await res.json();
+                throw error;
+            }
             const missingNames = await res.json();
             this.setState((previousState, props) => {
                 return {

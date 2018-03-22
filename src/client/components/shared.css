@@ -39,6 +39,10 @@
     color: #FFFFFF;
 }
 
+:local(.w30) {
+    width: 30%;
+}
+
 :local(.w75) {
     width: 75%;
 }
