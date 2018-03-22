@@ -8,11 +8,11 @@ import log from "./log";
 import * as path from "path";
 import * as process from "process";
 import Persistence from "./persistence";
+import * as uuid4 from "uuid/v4";
 
 export default class App {
     persistence: Persistence;
     static password = "test";
-    static secret = "Super-Secret";
 
     constructor() {
         this.persistence = new Persistence(args.persistenceServer, args.persistencePort, args.persistenceAppName, args.persistenceAppKey);
@@ -24,7 +24,17 @@ export default class App {
             extended: true
         }));
         app.use(cookieParser());
-        app.use(jwt.init(App.secret));
+        // Use a random string as the secret for the JWTs. This means JWTs will not
+        // survive application restarts, but improves the security. The secret is
+        // unknown until runtime and is harder to spoof a new JWT.
+        app.use(jwt.init(uuid4(), {
+            signOptions: {
+                expiresIn: "1h"
+            },
+            verifyOptions: {
+                ignoreExpiration: false
+            }
+        }));
         app.get("/", async (req, res, next) => await this.serveHome(req, res, next));
         app.use(express.static(__dirname));
         app.get("/login", async (req, res, next) => await this.serveReactClientApp(req, res, next));
