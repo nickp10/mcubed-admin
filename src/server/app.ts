@@ -71,7 +71,7 @@ export default class App {
     }
 
     async serveHome(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
-        const jwt = (<any>req).jwt;
+        const jwt = req.jwt;
         if (jwt && jwt.valid && jwt.payload.isAdmin) {
             res.redirect("/lineup/alternateNames/list");
         } else {
