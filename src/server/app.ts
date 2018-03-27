@@ -40,30 +40,30 @@ export default class App {
         app.get("/login", async (req, res, next) => await this.serveReactClientApp(req, res, next));
         app.post("/login/json", async (req, res, next) => await this.login(req, res, next));
         app.get("/logout", async (req, res, next) => await this.logout(req, res, next));
-        app.get("/lineup/alternateNames/delete", async (req, res, next) => await this.deleteLineupAlternateName(req, res, next));
-        app.get("/lineup/alternateNames/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.post("/lineup/alternateNames/edit", async (req, res, next) => await this.editLineupAlternateName(req, res, next));
-        app.get("/lineup/alternateNames/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.get("/lineup/alternateNames/list/json", async (req, res, next) => await this.getLineupAlternateNames(req, res, next));
-        app.get("/lineup/alternateNames/get/json", async (req, res, next) => await this.getLineupAlternateName(req, res, next));
-        app.get("/lineup/missingNames/delete", async (req, res, next) => await this.deleteLineupMissingNames(req, res, next));
-        app.get("/lineup/missingNames/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.get("/lineup/missingNames/list/json", async (req, res, next) => await this.getLineupMissingNames(req, res, next));
-        app.get("/wheel/categories/:categoryID/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.get("/wheel/categories/:categoryID/words/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.post("/wheel/categories/:categoryID/words/edit", async (req, res, next) => await this.editWheelWord(req, res, next));
-        app.get("/wheel/categories/delete/json", async (req, res, next) => await this.deleteWheelCategory(req, res, next));
-        app.get("/wheel/categories/edit", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.post("/wheel/categories/edit", async (req, res, next) => await this.editWheelCategory(req, res, next));
-        app.get("/wheel/categories/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.get("/wheel/categories/list/json", async (req, res, next) => await this.getWheelCategories(req, res, next));
-        app.get("/wheel/categories/get/json", async (req, res, next) => await this.getWheelCategory(req, res, next));
-        app.get("/wheel/duplicates/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.get("/wheel/unverified/list", async (req, res, next) => await this.serveReactClientApp(req, res, next));
-        app.post("/wheel/words/approveMany/json", async (req, res, next) => await this.approveManyWheelWords(req, res, next));
-        app.get("/wheel/words/list/json", async (req, res, next) => await this.getWheelWords(req, res, next));
-        app.get("/wheel/words/get/json", async (req, res, next) => await this.getWheelWord(req, res, next));
-        app.get("/wheel/words/delete/json", async (req, res, next) => await this.deleteWheelWord(req, res, next));
+        app.get("/lineup/alternateNames/delete", jwt.active(), async (req, res, next) => await this.deleteLineupAlternateName(req, res, next));
+        app.get("/lineup/alternateNames/edit", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/lineup/alternateNames/edit", jwt.active(), async (req, res, next) => await this.editLineupAlternateName(req, res, next));
+        app.get("/lineup/alternateNames/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/lineup/alternateNames/list/json", jwt.active(), async (req, res, next) => await this.getLineupAlternateNames(req, res, next));
+        app.get("/lineup/alternateNames/get/json", jwt.active(), async (req, res, next) => await this.getLineupAlternateName(req, res, next));
+        app.get("/lineup/missingNames/delete", jwt.active(), async (req, res, next) => await this.deleteLineupMissingNames(req, res, next));
+        app.get("/lineup/missingNames/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/lineup/missingNames/list/json", jwt.active(), async (req, res, next) => await this.getLineupMissingNames(req, res, next));
+        app.get("/wheel/categories/:categoryID/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/categories/:categoryID/words/edit", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/categories/:categoryID/words/edit", jwt.active(), async (req, res, next) => await this.editWheelWord(req, res, next));
+        app.get("/wheel/categories/delete/json", jwt.active(), async (req, res, next) => await this.deleteWheelCategory(req, res, next));
+        app.get("/wheel/categories/edit", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/categories/edit", jwt.active(), async (req, res, next) => await this.editWheelCategory(req, res, next));
+        app.get("/wheel/categories/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/categories/list/json", jwt.active(), async (req, res, next) => await this.getWheelCategories(req, res, next));
+        app.get("/wheel/categories/get/json", jwt.active(), async (req, res, next) => await this.getWheelCategory(req, res, next));
+        app.get("/wheel/duplicates/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.get("/wheel/unverified/list", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/wheel/words/approveMany/json", jwt.active(), async (req, res, next) => await this.approveManyWheelWords(req, res, next));
+        app.get("/wheel/words/list/json", jwt.active(), async (req, res, next) => await this.getWheelWords(req, res, next));
+        app.get("/wheel/words/get/json", jwt.active(), async (req, res, next) => await this.getWheelWord(req, res, next));
+        app.get("/wheel/words/delete/json", jwt.active(), async (req, res, next) => await this.deleteWheelWord(req, res, next));
         app.use(async (err, req, res, next) => await this.handleError(err, req, res, next));
         app.listen(args.port, () => {
             log.info(`Server has started on port ${args.port}`);
@@ -283,6 +283,10 @@ export default class App {
     }
 
     async handleError(err: any, req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        if (err.name === "JWTExpressError") {
+            res.redirect("/login");
+            return;
+        }
         if (typeof err.status === "number") {
             res.status(err.status);
         } else {
