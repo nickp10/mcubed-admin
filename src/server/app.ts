@@ -87,7 +87,7 @@ export default class App {
     async login(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             if (req.body.password === App.password) {
-                (<any>res).jwt({
+                res.jwt({
                     isAdmin: true
                 });
                 res.sendStatus(200);
