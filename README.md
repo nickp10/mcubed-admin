@@ -24,5 +24,6 @@ The mcubed-persistence module is used to manage data stored by the other mCubed 
 
 * *lineupalternatenames* - **Used by mcubed-lineup-insight-server.** Manages the mapping between a third-party player name and the corresponding contest name. 
 * *lineupmissingnames* - **Used by mcubed-lineup-insight-server.** Manages the names that cannot be mapped to a corresponding contest name.
+* *users* - Used for authentication purposes. There will be an "admin" user stored in this table. In order to log into the admin page, the user must login with the admin's credentials.
 * *wheelcategories* - **Used by mcubed-wheel-capture.** Manages the categories for the wheel words.
 * *wheelwords* - **Used by mcubed-wheel-capture.** Manages the wheel words that have been captured.

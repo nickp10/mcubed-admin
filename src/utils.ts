@@ -1,3 +1,5 @@
+import * as crypto from "crypto-js";
+
 class Utils {
     coerceFloat(value: string): number {
         const parsed = parseFloat(value);
@@ -13,6 +15,10 @@ class Utils {
             return undefined;
         }
         return parsed;
+    }
+
+    hashPassword(password: string): string {
+        return crypto.SHA256(password).toString();
     }
 }
 

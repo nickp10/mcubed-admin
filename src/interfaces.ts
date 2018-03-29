@@ -5,6 +5,11 @@ export enum Sport {
     NHL
 }
 
+export interface IClientAppState {
+    hasAdminAccount: boolean;
+    isLoggedIn: boolean;
+}
+
 export interface IAlternateName {
     id?: string;
     contestName?: string;
@@ -18,6 +23,12 @@ export interface IMissingName {
     name?: string;
     sport?: Sport;
     team?: string;
+}
+
+export interface IUser {
+    id?: string;
+    username?: string;
+    password?: string;
 }
 
 export interface IWheelCategory {

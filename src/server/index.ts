@@ -1,4 +1,6 @@
 import App from "./app";
 
-const app = new App();
-app.startServer();
+(async () => {
+    const app = new App();
+    await app.startServer();
+})();

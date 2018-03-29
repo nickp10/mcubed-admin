@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import clientAppState from "../clientAppState";
 import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
 import AlternateNamesListComponent from "./lineup/alternateNamesList";
 import CategoryEditComponent from "./wheel/categoryEdit";
@@ -53,26 +54,30 @@ export default class App extends Component<AppProps, AppState> {
                                         <span className={styles.titleLeftQuote}>"Running through the fire,</span><br />
                                         <span className={styles.titleRightQuote}>daring you to follow me."</span>
                                     </td>
-                                    <td className={styles.userCell}>
-                                        <div className={styles.userDiv}>
-                                            <div className={styles.loggedInBlock}>Welcome&nbsp;back!</div>
-                                            <div className={styles.center}>
-                                                <a href="/logout" className={styles.button}>Logout</a>
+                                    {clientAppState.isLoggedIn && (
+                                        <td className={styles.userCell}>
+                                            <div className={styles.userDiv}>
+                                                <div className={styles.loggedInBlock}>Welcome&nbsp;back!</div>
+                                                <div className={styles.center}>
+                                                    <a href="/logout" className={styles.button}>Logout</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
+                                        </td>
+                                    )}
                                 </tr>
                             </table>
                         </div>
-                        <table className={styles.navigationTable}>
-                            <tr>
-                                <NavigationItem match="/lineup/alternateNames" to="/lineup/alternateNames/list" text="Lineup: Alternate Names" />
-                                <NavigationItem match="/lineup/missingNames" to="/lineup/missingNames/list" text="Lineup: Missing Names" />
-                                <NavigationItem match="/wheel/categories" to="/wheel/categories/list" text="Wheel Capture: Categories" />
-                                <NavigationItem match="/wheel/duplicates" to="/wheel/duplicates/list" text="Wheel Capture: Duplicates" />
-                                <NavigationItem match="/wheel/unverified" to="/wheel/unverified/list" text="Wheel Capture: Unverified" />
-                            </tr>
-                        </table>
+                        {clientAppState.isLoggedIn && (
+                            <table className={styles.navigationTable}>
+                                <tr>
+                                    <NavigationItem match="/lineup/alternateNames" to="/lineup/alternateNames/list" text="Lineup: Alternate Names" />
+                                    <NavigationItem match="/lineup/missingNames" to="/lineup/missingNames/list" text="Lineup: Missing Names" />
+                                    <NavigationItem match="/wheel/categories" to="/wheel/categories/list" text="Wheel Capture: Categories" />
+                                    <NavigationItem match="/wheel/duplicates" to="/wheel/duplicates/list" text="Wheel Capture: Duplicates" />
+                                    <NavigationItem match="/wheel/unverified" to="/wheel/unverified/list" text="Wheel Capture: Unverified" />
+                                </tr>
+                            </table>
+                        )}
                         <div className={styles.contentDiv}>
                             <Switch>
                                 <Route path="/login" component={LoginComponent} />

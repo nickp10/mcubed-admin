@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { RouteComponentProps } from "react-router-dom";
+import clientAppState from "../../clientAppState";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
@@ -18,7 +19,7 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
         this.state = { };
     }
 
-    async attemptLogin(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    async submitForm(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         try {
             event.preventDefault();
             this.setState((previousState, props) => {
@@ -28,12 +29,13 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
                     isLoading: true
                 }
             });
-            const res = await fetch(`/login/json`, {
+            const path = clientAppState.hasAdminAccount ? "/login/json" : "/createPassword/json";
+            const res = await fetch(path, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: `password=${this.state.password}`,
+                body: `password=${this.state.password || ''}`,
                 credentials: "same-origin"
             });
             if (res.status !== 200) {
@@ -63,14 +65,19 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
     render() {
         const { error, isLoading } = this.state;
         return (
-            <form onSubmit={this.attemptLogin.bind(this)}>
+            <form onSubmit={this.submitForm.bind(this)}>
                 <table className={`${sharedStyles.content} ${sharedStyles.w30}`}>
                     <tr>
-                        <th colSpan={2} className={sharedStyles.center}>Login</th>
+                        <th colSpan={2} className={sharedStyles.center}>{clientAppState.hasAdminAccount ? 'Login' : 'Create Password'}</th>
                     </tr>
                     {isLoading &&
                         <tr>
                             <td colSpan={2}>Logging in...</td>
+                        </tr>
+                    }
+                    {!isLoading && !clientAppState.hasAdminAccount &&
+                        <tr>
+                            <td colSpan={2}>The admin page needs to be setup. Create a password for the admin user.</td>
                         </tr>
                     }
                     {!isLoading &&
@@ -91,7 +98,7 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
                     {!isLoading &&
                         <tr>
                             <th colSpan={2} className={sharedStyles.center}>
-                                <input type="submit" value="Login" />
+                                <input type="submit" value={clientAppState.hasAdminAccount ? 'Login' : 'Create Password'} />
                             </th>
                         </tr>
                     }

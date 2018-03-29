@@ -1,4 +1,4 @@
-import { IAlternateName, IWheelCategory, IWheelWord } from "../interfaces";
+import { IAlternateName, IUser, IWheelCategory, IWheelWord } from "../interfaces";
 import args from "./args";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
@@ -6,19 +6,21 @@ import * as express from "express";
 import * as jwt from "jwt-express";
 import log from "./log";
 import * as path from "path";
-import * as process from "process";
 import Persistence from "./persistence";
+import * as process from "process";
+import template from "./template";
+import utils from "../utils";
 import * as uuid4 from "uuid/v4";
 
 export default class App {
     persistence: Persistence;
-    static password = "test";
+    static adminUsername = "admin";
 
     constructor() {
         this.persistence = new Persistence(args.persistenceServer, args.persistencePort, args.persistenceAppName, args.persistenceAppKey);
     }
 
-    startServer() {
+    async startServer(): Promise<void> {
         const app = express();
         app.use(bodyParser.urlencoded({
             extended: true
@@ -40,6 +42,7 @@ export default class App {
         app.get("/login", async (req, res, next) => await this.serveReactClientApp(req, res, next));
         app.post("/login/json", async (req, res, next) => await this.login(req, res, next));
         app.get("/logout", async (req, res, next) => await this.logout(req, res, next));
+        app.post("/createPassword/json", async (req, res, next) => await this.createPassword(req, res, next));
         app.get("/lineup/alternateNames/delete", jwt.active(), async (req, res, next) => await this.deleteLineupAlternateName(req, res, next));
         app.get("/lineup/alternateNames/edit", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
         app.post("/lineup/alternateNames/edit", jwt.active(), async (req, res, next) => await this.editLineupAlternateName(req, res, next));
@@ -72,23 +75,53 @@ export default class App {
 
     async serveHome(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         const jwt = req.jwt;
-        if (jwt && jwt.valid && jwt.payload.isAdmin) {
+        if (jwt && jwt.valid) {
             res.redirect("/lineup/alternateNames/list");
         } else {
             res.redirect("/login");
         }
     }
 
-    async serveReactClientApp(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
-        const reactClient = path.join(__dirname, "index.html");
-        res.sendFile(reactClient);
+    async serveReactClientApp(req: express.Request, res: express.Response, next: express.NextFunction, title?: string): Promise<void> {
+        const jwt = req.jwt;
+        const clientAppState = jwt && jwt.valid ? jwt.payload : undefined;
+        res.status(200).send(template(title, clientAppState || {
+            hasAdminAccount: !!await this.persistence.getUserByUsername(App.adminUsername),
+            isLoggedIn: false
+        }));
+    }
+
+    async createPassword(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        try {
+            let adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            if (adminUser) {
+                throw { message: "The admin user has already been setup. Consider using the change password page to update the password." };
+            }
+            if (!req.body.password) {
+                throw { status: 401, message: "Cannot create an admin user without a password." };
+            }
+            adminUser = {
+                username: App.adminUsername,
+                password: utils.hashPassword(req.body.password)
+            };
+            adminUser = await this.persistence.postUser(adminUser);
+            res.jwt({
+                hasAdminAccount: !!adminUser,
+                isLoggedIn: true
+            });
+            res.sendStatus(200);
+        } catch (error) {
+            next(error);
+        }
     }
 
     async login(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            if (req.body.password === App.password) {
+            const adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            if (adminUser && utils.hashPassword(req.body.password) === adminUser.password) {
                 res.jwt({
-                    isAdmin: true
+                    hasAdminAccount: !!adminUser,
+                    isLoggedIn: true
                 });
                 res.sendStatus(200);
             } else {

@@ -1,5 +1,4 @@
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
 
@@ -54,10 +53,6 @@ module.exports = {
         extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".css"]
     },
     plugins: [
-        new HtmlWebpackPlugin({
-            template: path.join(APP_DIR, "index.ejs"),
-            inject: "body"
-        }),
         new CopyWebpackPlugin([{
             from: path.join(APP_DIR, "images"),
             to: path.join(BUILD_DIR, "images")

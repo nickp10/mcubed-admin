@@ -1,4 +1,4 @@
-import { IAlternateName, IMissingName, IWheelCategory, IWheelWord, Sport } from "../interfaces";
+import { IAlternateName, IMissingName, IUser, IWheelCategory, IWheelWord, Sport } from "../interfaces";
 import * as http from "http";
 import * as querystring from "querystring";
 import log from "./log";
@@ -40,6 +40,19 @@ export default class Persistence {
 
     async deleteAlternateName(id: string): Promise<void> {
         return await this.deleteSingle("lineupalternatenames", id);
+    }
+
+    async getUserByUsername(username: string): Promise<IUser> {
+        const users = await this.getAllFiltered<IUser>("users", { username: username });
+        return users && users.length > 0 ? users[0] : undefined;
+    }
+
+    async postUser(user: IUser): Promise<IUser> {
+        return await this.postSingle("users", user);
+    }
+
+    async putUser(user: IUser): Promise<void> {
+        return await this.putSingle("users", user);
     }
 
     async getWheelCategory(id: string): Promise<IWheelCategory> {
@@ -129,6 +142,26 @@ export default class Persistence {
         } catch (error) {
             log.error(error);
             throw new Error("Cannot read all the records. Ensure the database is running and the correct database parameters have been specified.");
+        }
+    }
+
+    async getAllFiltered<T>(table: string, filter: T): Promise<T[]> {
+        if (!this.isValid) {
+            return undefined;
+        }
+        try {
+            const response = await this.sendRequest({
+                path: `/${table}?${querystring.stringify(filter)}`,
+                method: "GET"
+            });
+            const items: T[] = JSON.parse(response);
+            if (Array.isArray(items)) {
+                return items;
+            }
+            return undefined;
+        } catch (error) {
+            log.error(error);
+            throw new Error("Cannot read the filtered records. Ensure the database is running and the correct database parameters have been specified.");
         }
     }
 
