@@ -6,6 +6,7 @@ import AlternateNamesListComponent from "./lineup/alternateNamesList";
 import CategoryEditComponent from "./wheel/categoryEdit";
 import CategoriesListComponent from "./wheel/categoriesList";
 import CategoryWordListComponent from "./wheel/categoryWordList";
+import ChangePasswordComponent from "./auth/changePassword";
 import DuplicateWordsListComponent from "./wheel/duplicateWordsList";
 import LoginComponent from "./auth/login";
 import MissingNamesListComponent from "./lineup/missingNamesList";
@@ -59,6 +60,7 @@ export default class App extends Component<AppProps, AppState> {
                                             <div className={styles.userDiv}>
                                                 <div className={styles.loggedInBlock}>Welcome&nbsp;back!</div>
                                                 <div className={styles.center}>
+                                                    <a href="/changePassword" className={styles.button}>Change&nbsp;Password</a>&nbsp;
                                                     <a href="/logout" className={styles.button}>Logout</a>
                                                 </div>
                                             </div>
@@ -81,6 +83,7 @@ export default class App extends Component<AppProps, AppState> {
                         <div className={styles.contentDiv}>
                             <Switch>
                                 <Route path="/login" component={LoginComponent} />
+                                <Route path="/changePassword" component={ChangePasswordComponent} />
                                 <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
                                 <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
                                 <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />

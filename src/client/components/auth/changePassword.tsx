@@ -1,22 +1,22 @@
 import { Component } from "react";
 import { RouteComponentProps } from "react-router-dom";
-import clientAppState from "../../clientAppState";
 import * as querystring from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
-export interface LoginProps {
+export interface ChangePasswordProps {
 }
 
-export interface LoginState {
+export interface ChangePasswordState {
     isLoading?: boolean;
     error?: string;
+    currentPassword?: string;
     password?: string;
     confirmPassword?: string;
 }
 
-export default class LoginComponent extends Component<RouteComponentProps<LoginProps>, LoginState> {
-    constructor(props: RouteComponentProps<LoginProps>, context?: any) {
+export default class ChangePasswordComponent extends Component<RouteComponentProps<ChangePasswordProps>, ChangePasswordState> {
+    constructor(props: RouteComponentProps<ChangePasswordProps>, context?: any) {
         super(props, context);
         this.state = { };
     }
@@ -27,18 +27,19 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
             this.setState((previousState, props) => {
                 return {
                     error: undefined,
+                    currentPassword: previousState.currentPassword,
                     password: previousState.password,
                     confirmPassword: previousState.confirmPassword,
                     isLoading: true
                 }
             });
-            const path = clientAppState.hasAdminAccount ? "/login/json" : "/createPassword/json";
-            const res = await fetch(path, {
+            const res = await fetch("/changePassword/json", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: querystring.stringify({
+                    currentPassword: this.state.currentPassword || '',
                     password: this.state.password || '',
                     confirmPassword: this.state.confirmPassword || ''
                 }),
@@ -52,6 +53,7 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
         } catch (error) {
             this.setState({
                 error: error.message,
+                currentPassword: undefined,
                 password: undefined,
                 confirmPassword: undefined,
                 isLoading: false
@@ -59,11 +61,24 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
         }
     }
 
+    currentPasswordChanged(event: React.ChangeEvent<HTMLInputElement>): void {
+        const currentPassword = event.target.value;
+        this.setState((previousState, props) => {
+            return {
+                error: previousState.error,
+                currentPassword: currentPassword,
+                password: previousState.password,
+                confirmPassword: previousState.confirmPassword
+            };
+        });
+    }
+
     passwordChanged(event: React.ChangeEvent<HTMLInputElement>): void {
         const password = event.target.value;
         this.setState((previousState, props) => {
             return {
                 error: previousState.error,
+                currentPassword: previousState.currentPassword,
                 password: password,
                 confirmPassword: previousState.confirmPassword
             };
@@ -75,6 +90,7 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
         this.setState((previousState, props) => {
             return {
                 error: previousState.error,
+                currentPassword: previousState.currentPassword,
                 password: previousState.password,
                 confirmPassword: confirmPassword
             };
@@ -87,29 +103,34 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
             <form onSubmit={this.submitForm.bind(this)}>
                 <table className={`${sharedStyles.content} ${sharedStyles.w30}`}>
                     <tr>
-                        <th colSpan={2} className={sharedStyles.center}>{clientAppState.hasAdminAccount ? 'Login' : 'Create Password'}</th>
+                        <th colSpan={2} className={sharedStyles.center}>Change Password</th>
                     </tr>
                     {isLoading &&
                         <tr>
-                            <td colSpan={2}>Logging in...</td>
-                        </tr>
-                    }
-                    {!isLoading && !clientAppState.hasAdminAccount &&
-                        <tr>
-                            <td colSpan={2}>The admin page needs to be setup. Create a password for the admin user.</td>
+                            <td colSpan={2}>Loading...</td>
                         </tr>
                     }
                     {!isLoading &&
                         <tr>
                             <td>
-                                <strong>Password:</strong>
+                                <strong>Current Password:</strong>
                             </td>
                             <td>
-                                <input type="password" name="password" autoFocus={true} onChange={this.passwordChanged.bind(this)} />
+                                <input type="password" name="currentPassword" autoFocus={true} onChange={this.currentPasswordChanged.bind(this)} />
                             </td>
                         </tr>
                     }
-                    {!isLoading && !clientAppState.hasAdminAccount &&
+                    {!isLoading &&
+                        <tr>
+                            <td>
+                                <strong>New Password:</strong>
+                            </td>
+                            <td>
+                                <input type="password" name="password" onChange={this.passwordChanged.bind(this)} />
+                            </td>
+                        </tr>
+                    }
+                    {!isLoading &&
                         <tr>
                             <td>
                                 <strong>Confirm Password:</strong>
@@ -127,7 +148,7 @@ export default class LoginComponent extends Component<RouteComponentProps<LoginP
                     {!isLoading &&
                         <tr>
                             <th colSpan={2} className={sharedStyles.center}>
-                                <input type="submit" value={clientAppState.hasAdminAccount ? 'Login' : 'Create Password'} />
+                                <input type="submit" value="Change Password" />
                             </th>
                         </tr>
                     }

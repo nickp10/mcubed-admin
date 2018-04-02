@@ -42,6 +42,8 @@ export default class App {
         app.get("/login", async (req, res, next) => await this.serveReactClientApp(req, res, next));
         app.post("/login/json", async (req, res, next) => await this.login(req, res, next));
         app.get("/logout", async (req, res, next) => await this.logout(req, res, next));
+        app.get("/changePassword", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
+        app.post("/changePassword/json", jwt.active(), async (req, res, next) => await this.changePassword(req, res, next));
         app.post("/createPassword/json", async (req, res, next) => await this.createPassword(req, res, next));
         app.get("/lineup/alternateNames/delete", jwt.active(), async (req, res, next) => await this.deleteLineupAlternateName(req, res, next));
         app.get("/lineup/alternateNames/edit", jwt.active(), async (req, res, next) => await this.serveReactClientApp(req, res, next));
@@ -91,14 +93,40 @@ export default class App {
         }));
     }
 
+    async changePassword(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
+        try {
+            if (!req.body.password || !req.body.confirmPassword) {
+                throw { status: 401, message: "Cannot update the admin user without a password." };
+            }
+            if (req.body.password !== req.body.confirmPassword) {
+                throw { status: 400, message: "Password and confirm password must match." };
+            }
+            let adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            if (!adminUser) {
+                throw { message: "The admin user has not been setup. Consider using the create password page to setup the admin user." };
+            }
+            if (adminUser.password !== utils.hashPassword(req.body.currentPassword)) {
+                throw { status: 401, message: "Invalid current password was entered." };
+            }
+            adminUser.password = utils.hashPassword(req.body.password);
+            await this.persistence.putUser(adminUser);
+            res.sendStatus(200);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async createPassword(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
+            if (!req.body.password || !req.body.confirmPassword) {
+                throw { status: 401, message: "Cannot create an admin user without a password." };
+            }
+            if (req.body.password !== req.body.confirmPassword) {
+                throw { status: 400, message: "Password and confirm password must match." };
+            }
             let adminUser = await this.persistence.getUserByUsername(App.adminUsername);
             if (adminUser) {
                 throw { message: "The admin user has already been setup. Consider using the change password page to update the password." };
-            }
-            if (!req.body.password) {
-                throw { status: 401, message: "Cannot create an admin user without a password." };
             }
             adminUser = {
                 username: App.adminUsername,

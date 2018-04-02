@@ -74,6 +74,10 @@
     padding: 10px;
 }
 
+:local(.userDiv) :global(div) {
+    white-space: nowrap;
+}
+
 :local(.loggedInBlock) {
     margin-bottom: 10px;
 }

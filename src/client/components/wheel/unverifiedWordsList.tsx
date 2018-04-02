@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import * as querystring from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
@@ -90,7 +91,9 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: `ids=${ids}`,
+                body: querystring.stringify({
+                    ids: ids
+                }),
                 credentials: "same-origin"
             });
             if (res1.status !== 200) {
