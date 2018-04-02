@@ -1,4 +1,4 @@
-import { IAlternateName, IUser, IWheelCategory, IWheelWord } from "../interfaces";
+import { IAlternateName, IClientAppState, IUser, IWheelCategory, IWheelWord } from "../interfaces";
 import args from "./args";
 import * as bodyParser from "body-parser";
 import * as cookieParser from "cookie-parser";
@@ -84,13 +84,41 @@ export default class App {
         }
     }
 
+    getJWTPayload(jwt: jwt.JWT): IClientAppState {
+        if (!jwt || !jwt.valid) {
+            return undefined;
+        }
+        return jwt.payload;
+    }
+
+    generateJWTPayload(adminUser: IUser, isLoggedIn: boolean): IClientAppState {
+        return {
+            hasAdminAccount: !!adminUser,
+            isLoggedIn: isLoggedIn,
+            serverError: undefined
+        };
+    }
+
+    async generateDefaultClientAppState(): Promise<IClientAppState> {
+        try {
+            const adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            return {
+                hasAdminAccount: !!adminUser,
+                isLoggedIn: false,
+                serverError: undefined
+            };
+        } catch (error) {
+            return {
+                hasAdminAccount: false,
+                isLoggedIn: false,
+                serverError: error.message
+            };
+        }
+    }
+
     async serveReactClientApp(req: express.Request, res: express.Response, next: express.NextFunction, title?: string): Promise<void> {
-        const jwt = req.jwt;
-        const clientAppState = jwt && jwt.valid ? jwt.payload : undefined;
-        res.status(200).send(template(title, clientAppState || {
-            hasAdminAccount: !!await this.persistence.getUserByUsername(App.adminUsername),
-            isLoggedIn: false
-        }));
+        const clientAppState = this.getJWTPayload(req.jwt) || await this.generateDefaultClientAppState();
+        res.status(200).send(template(title, clientAppState));
     }
 
     async changePassword(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
@@ -133,10 +161,7 @@ export default class App {
                 password: utils.hashPassword(req.body.password)
             };
             adminUser = await this.persistence.postUser(adminUser);
-            res.jwt({
-                hasAdminAccount: !!adminUser,
-                isLoggedIn: true
-            });
+            res.jwt(this.generateJWTPayload(adminUser, true));
             res.sendStatus(200);
         } catch (error) {
             next(error);
@@ -147,10 +172,7 @@ export default class App {
         try {
             const adminUser = await this.persistence.getUserByUsername(App.adminUsername);
             if (adminUser && utils.hashPassword(req.body.password) === adminUser.password) {
-                res.jwt({
-                    hasAdminAccount: !!adminUser,
-                    isLoggedIn: true
-                });
+                res.jwt(this.generateJWTPayload(adminUser, true));
                 res.sendStatus(200);
             } else {
                 throw { status: 401, message: "Unable to login" };

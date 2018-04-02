@@ -8,6 +8,7 @@ export enum Sport {
 export interface IClientAppState {
     hasAdminAccount: boolean;
     isLoggedIn: boolean;
+    serverError: string;
 }
 
 export interface IAlternateName {

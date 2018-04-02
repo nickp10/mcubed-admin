@@ -43,8 +43,7 @@ export default class Persistence {
     }
 
     async getUserByUsername(username: string): Promise<IUser> {
-        const users = await this.getAllFiltered<IUser>("users", { username: username });
-        return users && users.length > 0 ? users[0] : undefined;
+        return await this.getSingleFiltered<IUser>("users", { username: username });
     }
 
     async postUser(user: IUser): Promise<IUser> {
@@ -178,6 +177,15 @@ export default class Persistence {
         } catch (error) {
             log.error(error);
             throw new Error("Cannot read the record with the specified ID. Ensure the database is running and the correct database parameters have been specified.");
+        }
+    }
+
+    async getSingleFiltered<T>(table: string, filter: T): Promise<T> {
+        try {
+            const items = await this.getAllFiltered<T>(table, filter);
+            return items && items.length > 0 ? items[0] : undefined;
+        } catch (error) {
+            throw error;
         }
     }
 

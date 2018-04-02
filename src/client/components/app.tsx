@@ -34,6 +34,7 @@ export default class App extends Component<AppProps, AppState> {
     }
 
     render() {
+        const { serverError } = clientAppState;
         const { error } = this.state;
         const NavigationItem = ({ match, to, text, ...rest }) => (
             <Route path={match} children={(routeProps) => (
@@ -81,19 +82,24 @@ export default class App extends Component<AppProps, AppState> {
                             </table>
                         )}
                         <div className={styles.contentDiv}>
-                            <Switch>
-                                <Route path="/login" component={LoginComponent} />
-                                <Route path="/changePassword" component={ChangePasswordComponent} />
-                                <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
-                                <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
-                                <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
-                                <Route path="/wheel/categories/edit" component={CategoryEditComponent} />
-                                <Route path="/wheel/categories/list" component={CategoriesListComponent} />
-                                <Route path="/wheel/categories/:categoryID/list" component={CategoryWordListComponent} />
-                                <Route path="/wheel/categories/:categoryID/words/edit" component={WordEditComponent} />
-                                <Route path="/wheel/duplicates/list" component={DuplicateWordsListComponent} />
-                                <Route path="/wheel/unverified/list" component={UnverifiedWordsListComponent} />
-                            </Switch>
+                            {!!serverError && (
+                                <div className={styles.error}>{serverError}</div>
+                            )}
+                            {!serverError && (
+                                <Switch>
+                                    <Route path="/login" component={LoginComponent} />
+                                    <Route path="/changePassword" component={ChangePasswordComponent} />
+                                    <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
+                                    <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
+                                    <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
+                                    <Route path="/wheel/categories/edit" component={CategoryEditComponent} />
+                                    <Route path="/wheel/categories/list" component={CategoriesListComponent} />
+                                    <Route path="/wheel/categories/:categoryID/list" component={CategoryWordListComponent} />
+                                    <Route path="/wheel/categories/:categoryID/words/edit" component={WordEditComponent} />
+                                    <Route path="/wheel/duplicates/list" component={DuplicateWordsListComponent} />
+                                    <Route path="/wheel/unverified/list" component={UnverifiedWordsListComponent} />
+                                </Switch>
+                            )}
                         </div>
                         <div className={styles.copyrightDiv}>
                             &copy;2012-{new Date().getFullYear()} mCubed Technologies
