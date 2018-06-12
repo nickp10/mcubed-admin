@@ -1,12 +1,14 @@
 import { Component } from "react";
 import { IWheelWord } from "../../../interfaces";
+import { ObjectID } from "bson";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString}  from "../../../objectIDUtils";
 import * as qs from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
 export interface WordEditProps {
-    categoryID: string;
+    categoryID: ObjectID;
 }
 
 export interface WordEditState {
@@ -76,11 +78,11 @@ export default class WordEditComponent extends Component<RouteComponentProps<Wor
             return (<div>Loading...</div>);
         } else {
             return (
-                <form action={`/wheel/categories/${word.categoryID}/words/edit`} method="POST">
-                    <input type="hidden" name="id" value={word.id} />
+                <form action={`/wheel/categories/${idToString(word.categoryID)}/words/edit`} method="POST">
+                    <input type="hidden" name="id" value={idToString(word._id)} />
                     <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                         <tr>
-                            <th colSpan={2} className={sharedStyles.center}>{word.id ? "Edit" : "Add"} Word</th>
+                            <th colSpan={2} className={sharedStyles.center}>{word._id ? "Edit" : "Add"} Word</th>
                         </tr>
                         <tr>
                             <td>

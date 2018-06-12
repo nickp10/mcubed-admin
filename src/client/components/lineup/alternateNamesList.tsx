@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString}  from "../../../objectIDUtils";
 import * as moment from "moment";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
@@ -94,8 +95,8 @@ export default class AlternateNamesListComponent extends Component<RouteComponen
                             <td>{alternateName.contestName || "N/A"}</td>
                             <td dangerouslySetInnerHTML={this.formatDateHTML(alternateName)}></td>
                             <td>
-                                <a className={sharedStyles.link} href={"/lineup/alternateNames/edit?id=" + alternateName.id}>Edit</a>&nbsp;
-                                <a className={sharedStyles.link} href={"/lineup/alternateNames/delete?id=" + alternateName.id}>Delete</a>
+                                <a className={sharedStyles.link} href={"/lineup/alternateNames/edit?id=" + idToString(alternateName._id)}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={"/lineup/alternateNames/delete?id=" + idToString(alternateName._id)}>Delete</a>
                             </td>
                         </tr>
                     ))}

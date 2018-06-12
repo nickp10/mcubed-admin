@@ -1,6 +1,8 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString, idEquals}  from "../../../objectIDUtils";
+import { ObjectID } from "bson";
 import * as querystring from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
@@ -85,7 +87,7 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                     isLoaded: false
                 };
             });
-            const ids = this.state.unverifiedWords.map(w => w.id).join(",");
+            const ids = this.state.unverifiedWords.map(w => idToString(w._id)).join(",");
             const res1 = await fetch("/wheel/words/approveMany/json", {
                 method: "POST",
                 headers: {
@@ -126,7 +128,7 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
 
     async deleteWord(word: IWheelWord): Promise<void> {
         try {
-            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`, {
+            const res = await fetch(`/wheel/words/delete/json?id=${idToString(word._id)}`, {
                 credentials: "same-origin"
             });
             if (res.status !== 200) {
@@ -136,7 +138,7 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
             this.setState((previousState, props) => {
                 return {
                     categories: previousState.categories,
-                    unverifiedWords: previousState.unverifiedWords.filter(w => w.id !== word.id),
+                    unverifiedWords: previousState.unverifiedWords.filter(w => !idEquals(w._id, word._id)),
                     sortAscending: previousState.sortAscending,
                     sortProperty: previousState.sortProperty,
                     isLoaded: true
@@ -149,8 +151,8 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
         }
     }
 
-    formatCategoryName(id: string): string {
-        const category = this.state.categories.find(c => c.id === id);
+    formatCategoryName(id: ObjectID): string {
+        const category = this.state.categories.find(c => idEquals(c._id, id));
         return category ? category.name : undefined;
     }
 
@@ -173,7 +175,7 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
                             <td>{unverifiedWord.word || "N/A"}</td>
                             <td>{this.formatCategoryName(unverifiedWord.categoryID) || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={`/wheel/categories/${unverifiedWord.categoryID}/words/edit?id=${unverifiedWord.id}`}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${idToString(unverifiedWord.categoryID)}/words/edit?id=${idToString(unverifiedWord._id)}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, unverifiedWord)}>Delete</a>
                             </td>
                         </tr>

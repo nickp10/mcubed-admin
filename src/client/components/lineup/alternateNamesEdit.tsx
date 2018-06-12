@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString}  from "../../../objectIDUtils";
 import * as moment from "moment";
 import * as qs from "querystring";
 import * as React from "react";
@@ -81,10 +82,10 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
         } else {
             return (
                 <form action="/lineup/alternateNames/edit" method="POST">
-                    <input type="hidden" name="id" value={alternateName.id} />
+                    <input type="hidden" name="id" value={idToString(alternateName._id)} />
                     <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                         <tr>
-                            <th colSpan={2} className={sharedStyles.center}>{alternateName.id ? "Edit" : "Add"} Lineup Alternate Name</th>
+                            <th colSpan={2} className={sharedStyles.center}>{alternateName._id ? "Edit" : "Add"} Lineup Alternate Name</th>
                         </tr>
                         <tr>
                             <td>
@@ -92,7 +93,7 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
                                 The name of the player that is retrieved from an external source (e.g., RotoWire, NumberFire, etc.).
                             </td>
                             <td>
-                                <input type="text" name="externalName" autoFocus={!!alternateName.id || !alternateName.externalName} defaultValue={alternateName.externalName} />
+                                <input type="text" name="externalName" autoFocus={!!alternateName._id || !alternateName.externalName} defaultValue={alternateName.externalName} />
                             </td>
                         </tr>
                         <tr>
@@ -101,7 +102,7 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
                                 The name of the player that is retrieved from the contest source (e.g., FanDuel, DraftKings, etc.).
                             </td>
                             <td>
-                                <input type="text" name="contestName" autoFocus={!alternateName.id && !!alternateName.externalName} defaultValue={alternateName.contestName} />
+                                <input type="text" name="contestName" autoFocus={!alternateName._id && !!alternateName.externalName} defaultValue={alternateName.contestName} />
                             </td>
                         </tr>
                         <tr>

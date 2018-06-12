@@ -1,12 +1,14 @@
 import { Component } from "react";
 import { IWheelWord } from "../../../interfaces";
+import { ObjectID } from "bson";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString, idEquals}  from "../../../objectIDUtils";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface CategoryWordListProps {
-    categoryID: string;
+    categoryID: ObjectID;
 }
 
 export interface CategoryWordListState {
@@ -50,7 +52,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
             const words: IWheelWord[] = await res.json();
             this.setState((previousState, props) => {
                 return {
-                    words: words.filter(w => w.categoryID === this.props.match.params.categoryID),
+                    words: words.filter(w => idEquals(w.categoryID, this.props.match.params.categoryID)),
                     sortAscending: previousState.sortAscending,
                     sortProperty: previousState.sortProperty,
                     isLoaded: true
@@ -65,7 +67,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async deleteWord(word: IWheelWord): Promise<void> {
         try {
-            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`, {
+            const res = await fetch(`/wheel/words/delete/json?id=${idToString(word._id)}`, {
                 credentials: "same-origin"
             });
             if (res.status !== 200) {
@@ -74,7 +76,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
             }
             this.setState((previousState, props) => {
                 return {
-                    words: previousState.words.filter(w => w.id !== word.id),
+                    words: previousState.words.filter(w => !idEquals(w._id, word._id)),
                     sortAscending: previousState.sortAscending,
                     sortProperty: previousState.sortProperty,
                     isLoaded: true
@@ -104,7 +106,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                         <tr className={sharedStyles.highlight}>
                             <td>{word.word || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={`/wheel/categories/${word.categoryID}/words/edit?id=${word.id}`}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${idToString(word.categoryID)}/words/edit?id=${idToString(word._id)}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, word)}>Delete</a>
                             </td>
                         </tr>
@@ -116,7 +118,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                     }
                     <tr>
                         <th colSpan={2} className={sharedStyles.center}>
-                            <a className={sharedStyles.link} href={`/wheel/categories/${this.props.match.params.categoryID}/words/edit`}>Add</a>
+                            <a className={sharedStyles.link} href={`/wheel/categories/${idToString(this.props.match.params.categoryID)}/words/edit`}>Add</a>
                         </th>
                     </tr>
                 </table>

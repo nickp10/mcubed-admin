@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { IWheelCategory } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString, idEquals}  from "../../../objectIDUtils";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
@@ -64,7 +65,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
 
     async deleteCategory(category: IWheelCategory): Promise<void> {
         try {
-            const res = await fetch(`/wheel/categories/delete/json?id=${category.id}`, {
+            const res = await fetch(`/wheel/categories/delete/json?id=${idToString(category._id)}`, {
                 credentials: "same-origin"
             });
             if (res.status !== 200) {
@@ -73,7 +74,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
             }
             this.setState((previousState, props) => {
                 return {
-                    categories: previousState.categories.filter(c => c.id !== category.id),
+                    categories: previousState.categories.filter(c => !idEquals(c._id, category._id)),
                     sortAscending: previousState.sortAscending,
                     sortProperty: previousState.sortProperty,
                     isLoaded: true
@@ -101,9 +102,9 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                     </tr>
                     {categories.sort((a, b) => sorting.compareObjects(a, b, this.state)).map(category => (
                         <tr className={sharedStyles.highlight}>
-                            <td><a className={sharedStyles.link} href={`/wheel/categories/${category.id}/list`}>{category.name || "N/A"}</a></td>
+                            <td><a className={sharedStyles.link} href={`/wheel/categories/${idToString(category._id)}/list`}>{category.name || "N/A"}</a></td>
                             <td>
-                                <a className={sharedStyles.link} href={"/wheel/categories/edit?id=" + category.id}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={"/wheel/categories/edit?id=" + idToString(category._id)}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteCategory.bind(this, category)}>Delete</a>
                             </td>
                         </tr>

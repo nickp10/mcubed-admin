@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { IMissingName, Sport } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString}  from "../../../objectIDUtils";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
@@ -86,7 +87,7 @@ export default class MissingNamesListComponent extends Component<RouteComponentP
                             <td>{missingName.count}</td>
                             <td>
                                 <a className={sharedStyles.link} href={"/lineup/alternateNames/edit?externalName=" + encodeURIComponent(missingName.name)}>Add</a>&nbsp;
-                                <a className={sharedStyles.link} href={"/lineup/missingNames/delete?id=" + missingName.id}>Delete</a>
+                                <a className={sharedStyles.link} href={"/lineup/missingNames/delete?id=" + idToString(missingName._id)}>Delete</a>
                             </td>
                         </tr>
                     ))}

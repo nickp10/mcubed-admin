@@ -1,3 +1,5 @@
+import { ObjectID } from "bson";
+
 export enum Sport {
     MLB = 1,
     NBA,
@@ -12,14 +14,14 @@ export interface IClientAppState {
 }
 
 export interface IAlternateName {
-    id?: string;
+    _id?: ObjectID;
     contestName?: string;
     externalName?: string;
     lastUsedDate?: Date;
 }
 
 export interface IMissingName {
-    id?: string;
+    _id?: ObjectID;
     count?: number;
     name?: string;
     sport?: Sport;
@@ -27,19 +29,19 @@ export interface IMissingName {
 }
 
 export interface IUser {
-    id?: string;
+    _id?: ObjectID;
     username?: string;
     password?: string;
 }
 
 export interface IWheelCategory {
-    id?: string;
+    _id?: ObjectID;
     name?: string;
 }
 
 export interface IWheelWord {
     approved?: boolean;
-    id?: string;
-    categoryID?: string;
+    _id?: ObjectID;
+    categoryID?: ObjectID;
     word?: string;
 }

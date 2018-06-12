@@ -1,6 +1,8 @@
 import { Component } from "react";
 import { IWheelCategory } from "../../../interfaces";
+import { ObjectID } from "bson";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString, idToObjectID}  from "../../../objectIDUtils";
 import * as qs from "querystring";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
@@ -10,7 +12,7 @@ export interface CategoryEditProps {
 
 export interface CategoryEditState {
     category?: IWheelCategory;
-    categoryID?: string;
+    categoryID?: ObjectID;
     error?: string;
     isLoaded?: boolean;
 }
@@ -21,7 +23,7 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
         const search = this.props.location.search;
         const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);
         this.state = {
-            categoryID: this.getQueryStringValue(query, "id")
+            categoryID: idToObjectID(this.getQueryStringValue(query, "id"))
         };
     }
 
@@ -43,7 +45,7 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
     async componentDidMount() {
         try {
             if (this.state.categoryID) {
-                const res = await fetch(`/wheel/categories/get/json?id=${this.state.categoryID}`, {
+                const res = await fetch(`/wheel/categories/get/json?id=${idToString(this.state.categoryID)}`, {
                     credentials: "same-origin"
                 });
                 if (res.status !== 200) {
@@ -74,10 +76,10 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
         } else {
             return (
                 <form action="/wheel/categories/edit" method="POST">
-                    <input type="hidden" name="id" value={category.id} />
+                    <input type="hidden" name="id" value={idToString(category._id)} />
                     <table className={`${sharedStyles.content} ${sharedStyles.w75}`}>
                         <tr>
-                            <th colSpan={2} className={sharedStyles.center}>{category.id ? "Edit" : "Add"} Category</th>
+                            <th colSpan={2} className={sharedStyles.center}>{category._id ? "Edit" : "Add"} Category</th>
                         </tr>
                         <tr>
                             <td>

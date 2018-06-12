@@ -1,20 +1,41 @@
 import { IAlternateName, IMissingName, IUser, IWheelCategory, IWheelWord, Sport } from "../interfaces";
-import * as http from "http";
-import * as querystring from "querystring";
+import { MongoClient, Db, ObjectID } from "mongodb";
 import log from "./log";
 
 export default class Persistence {
     isValid: boolean;
+    client: MongoClient;
+    db: Db;
 
-    constructor(private persistenceServer: string, private persistencePort: number, private persistenceAppName: string, private persistenceAppKey: string) {
-        this.isValid = !(!this.persistenceServer || !this.persistencePort || !this.persistenceAppName || !this.persistenceAppKey);
+    constructor(private mongoConnectionUrl: string, private mongoDBName: string) {
+        this.isValid = !(!this.mongoConnectionUrl || !this.mongoDBName);
+    }
+
+    async connectDB(): Promise<Db> {
+        if (!this.client) {
+            this.client = await MongoClient.connect(this.mongoConnectionUrl);
+        }
+        if (!this.db) {
+            this.db = this.client.db(this.mongoDBName);
+        }
+        return this.db;
+    }
+
+    disconnectDB(): void {
+        if (this.db) {
+            this.db = undefined;
+        }
+        if (this.client) {
+            this.client.close();
+            this.client = undefined;
+        }
     }
 
     async getMissingNames(): Promise<IMissingName[]> {
         return await this.getAll<IMissingName>("lineupmissingnames");
     }
 
-    async deleteMissingName(id: string): Promise<void> {
+    async deleteMissingName(id: ObjectID): Promise<void> {
         return await this.deleteSingle("lineupmissingnames", id);
     }
 
@@ -22,7 +43,7 @@ export default class Persistence {
         return await this.deleteAll("lineupmissingnames");
     }
 
-    async getAlternateName(id: string): Promise<IAlternateName> {
+    async getAlternateName(id: ObjectID): Promise<IAlternateName> {
         return await this.getSingle<IAlternateName>("lineupalternatenames", id);
     }
 
@@ -38,7 +59,7 @@ export default class Persistence {
         return await this.putSingle("lineupalternatenames", alternateName);
     }
 
-    async deleteAlternateName(id: string): Promise<void> {
+    async deleteAlternateName(id: ObjectID): Promise<void> {
         return await this.deleteSingle("lineupalternatenames", id);
     }
 
@@ -54,7 +75,7 @@ export default class Persistence {
         return await this.putSingle("users", user);
     }
 
-    async getWheelCategory(id: string): Promise<IWheelCategory> {
+    async getWheelCategory(id: ObjectID): Promise<IWheelCategory> {
         return await this.getSingle<IWheelCategory>("wheelcategories", id);
     }
 
@@ -62,7 +83,7 @@ export default class Persistence {
         return await this.getAll<IWheelCategory>("wheelcategories");
     }
 
-    async deleteWheelCategory(id: string): Promise<void> {
+    async deleteWheelCategory(id: ObjectID): Promise<void> {
         return await this.deleteSingle("wheelcategories", id);
     }
 
@@ -74,7 +95,7 @@ export default class Persistence {
         return await this.putSingle("wheelcategories", wheelCategory);
     }
 
-    async getWheelWord(id: string): Promise<IWheelWord> {
+    async getWheelWord(id: ObjectID): Promise<IWheelWord> {
         return await this.getSingle<IWheelWord>("wheelwords", id);
     }
 
@@ -90,7 +111,7 @@ export default class Persistence {
         return await this.putSingle("wheelwords", wheelWord);
     }
 
-    async deleteWheelWord(id: string): Promise<void> {
+    async deleteWheelWord(id: ObjectID): Promise<void> {
         return await this.deleteSingle("wheelwords", id);
     }
 
@@ -99,25 +120,21 @@ export default class Persistence {
             return undefined;
         }
         try {
-            await this.sendRequest({
-                path: `/${table}`,
-                method: "DELETE"
-            });
+            const db = await this.connectDB();
+            await db.dropCollection(table);
         } catch (error) {
             log.error(error);
             throw new Error("Cannot delete all the records. Ensure the database is running and the correct database parameters have been specified.");
         }
     }
 
-    async deleteSingle(table: string, id: string): Promise<void> {
+    async deleteSingle(table: string, id: ObjectID): Promise<void> {
         if (!this.isValid || !id) {
             return undefined;
         }
         try {
-            await this.sendRequest({
-                path: `/${table}/${id}`,
-                method: "DELETE"
-            });
+            const db = await this.connectDB();
+            await db.collection(table).deleteOne({ _id: id });
         } catch (error) {
             log.error(error);
             throw new Error("Cannot delete the specified record. Ensure the database is running and the correct database parameters have been specified.");
@@ -129,15 +146,9 @@ export default class Persistence {
             return undefined;
         }
         try {
-            const response = await this.sendRequest({
-                path: `/${table}`,
-                method: "GET"
-            });
-            const items: T[] = JSON.parse(response);
-            if (Array.isArray(items)) {
-                return items;
-            }
-            return undefined;
+            const db = await this.connectDB();
+            const cursor = await db.collection(table).find<T>();
+            return await cursor.toArray();
         } catch (error) {
             log.error(error);
             throw new Error("Cannot read all the records. Ensure the database is running and the correct database parameters have been specified.");
@@ -149,31 +160,22 @@ export default class Persistence {
             return undefined;
         }
         try {
-            const response = await this.sendRequest({
-                path: `/${table}?${querystring.stringify(filter)}`,
-                method: "GET"
-            });
-            const items: T[] = JSON.parse(response);
-            if (Array.isArray(items)) {
-                return items;
-            }
-            return undefined;
+            const db = await this.connectDB();
+            const cursor = await db.collection(table).find<T>(filter);
+            return await cursor.toArray();
         } catch (error) {
             log.error(error);
             throw new Error("Cannot read the filtered records. Ensure the database is running and the correct database parameters have been specified.");
         }
     }
 
-    async getSingle<T>(table: string, id: string): Promise<T> {
+    async getSingle<T>(table: string, id: ObjectID): Promise<T> {
         if (!this.isValid || !id) {
             return undefined;
         }
         try {
-            const response = await this.sendRequest({
-                path: `/${table}/${id}`,
-                method: "GET"
-            });
-            return JSON.parse(response);
+            const db = await this.connectDB();
+            return await db.collection(table).findOne<T>({ _id: id });
         } catch (error) {
             log.error(error);
             throw new Error("Cannot read the record with the specified ID. Ensure the database is running and the correct database parameters have been specified.");
@@ -182,80 +184,39 @@ export default class Persistence {
 
     async getSingleFiltered<T>(table: string, filter: T): Promise<T> {
         try {
-            const items = await this.getAllFiltered<T>(table, filter);
-            return items && items.length > 0 ? items[0] : undefined;
+            const db = await this.connectDB();
+            return await db.collection(table).findOne<T>(filter);
         } catch (error) {
             throw error;
         }
     }
 
-    async postSingle<T extends { id?: string }>(table: string, item: T): Promise<T> {
-        if (!this.isValid || !item || item.id) {
+    async postSingle<T extends { _id?: ObjectID }>(table: string, item: T): Promise<T> {
+        if (!this.isValid || !item || item._id) {
             return item;
         }
+        delete item._id;
         try {
-            const response = await this.sendRequest({
-                path: `/${table}`,
-                method: "POST"
-            }, JSON.stringify(item));
-            return JSON.parse(response);
+            const db = await this.connectDB();
+            const result = await db.collection(table).insertOne(item);
+            item._id = result.insertedId;
+            return item;
         } catch (error) {
             log.error(error);
             throw new Error("Cannot create the specified record. Ensure the database is running and the correct database parameters have been specified.");
         }
     }
 
-    async putSingle<T extends { id?: string }>(table: string, item: T): Promise<void> {
-        if (!this.isValid || !item || !item.id) {
+    async putSingle<T extends { _id?: ObjectID }>(table: string, item: T): Promise<void> {
+        if (!this.isValid || !item || !item._id) {
             return undefined;
         }
         try {
-            await this.sendRequest({
-                path: `/${table}/${item.id}`,
-                method: "PUT"
-            }, JSON.stringify(item));
+            const db = await this.connectDB();
+            await db.collection(table).findOneAndUpdate({ _id: item._id }, { $set: item });
         } catch (error) {
             log.error(error);
             throw new Error("Cannot update the specified record. Ensure the database is running and the correct database parameters have been specified.");
         }
-    }
-
-    async sendRequest(request: http.RequestOptions, data?: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            const headers = request.headers || { };
-            if (data) {
-                headers["content-type"] = "application/json";
-                headers["content-length"] = data.length;
-            }
-            headers["mcubed-app-name"] = this.persistenceAppName;
-            headers["mcubed-app-key"] = this.persistenceAppKey;
-            request.headers = headers;
-            request.host = this.persistenceServer;
-            request.port = this.persistencePort;
-            const req = http.request(request, resp => {
-                let body = "";
-                resp.on("data", data => {
-                    body += data;
-                });
-                resp.on("end", () => {
-                    if (resp.statusCode === 200 || resp.statusCode === 201 || resp.statusCode === 202) {
-                        resolve(body);
-                    } else {
-                        const errorObj = JSON.parse(body);
-                        if (errorObj && errorObj.error) {
-                            reject(errorObj.error);
-                        } else {
-                            reject(body);
-                        }
-                    }
-                });
-            }).on("error", error => {
-                reject(error.message);
-            });
-            if (data) {
-                req.write(data);
-            }
-            req.end();
-        });
     }
 }

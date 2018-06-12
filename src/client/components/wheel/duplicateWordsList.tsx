@@ -1,6 +1,8 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
 import { RouteComponentProps } from "react-router-dom";
+import { idToString, idEquals}  from "../../../objectIDUtils";
+import { ObjectID } from "bson";
 import * as React from "react";
 import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
@@ -75,7 +77,7 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
 
     async deleteWord(word: IWheelWord): Promise<void> {
         try {
-            const res = await fetch(`/wheel/words/delete/json?id=${word.id}`, {
+            const res = await fetch(`/wheel/words/delete/json?id=${idToString(word._id)}`, {
                 credentials: "same-origin"
             });
             if (res.status !== 200) {
@@ -118,8 +120,8 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
         return duplicates;
     }
 
-    formatCategoryName(id: string): string {
-        const category = this.state.categories.find(c => c.id === id);
+    formatCategoryName(id: ObjectID): string {
+        const category = this.state.categories.find(c => idEquals(c._id, id));
         return category ? category.name : undefined;
     }
 
@@ -142,7 +144,7 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
                             <td>{duplicateWord.word || "N/A"}</td>
                             <td>{this.formatCategoryName(duplicateWord.categoryID) || "N/A"}</td>
                             <td>
-                                <a className={sharedStyles.link} href={`/wheel/categories/${duplicateWord.categoryID}/words/edit?id=${duplicateWord.id}`}>Edit</a>&nbsp;
+                                <a className={sharedStyles.link} href={`/wheel/categories/${idToString(duplicateWord.categoryID)}/words/edit?id=${idToString(duplicateWord._id)}`}>Edit</a>&nbsp;
                                 <a className={sharedStyles.link} onClick={this.deleteWord.bind(this, duplicateWord)}>Delete</a>
                             </td>
                         </tr>
