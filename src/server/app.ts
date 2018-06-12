@@ -103,7 +103,7 @@ export default class App {
 
     async generateDefaultClientAppState(): Promise<IClientAppState> {
         try {
-            const adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            const adminUser = await this.persistence.users.getSingleFiltered({ username: App.adminUsername });
             return {
                 hasAdminAccount: !!adminUser,
                 isLoggedIn: false,
@@ -131,7 +131,7 @@ export default class App {
             if (req.body.password !== req.body.confirmPassword) {
                 throw { status: 400, message: "Password and confirm password must match." };
             }
-            let adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            let adminUser = await this.persistence.users.getSingleFiltered({ username: App.adminUsername});
             if (!adminUser) {
                 throw { message: "The admin user has not been setup. Consider using the create password page to setup the admin user." };
             }
@@ -139,7 +139,7 @@ export default class App {
                 throw { status: 401, message: "Invalid current password was entered." };
             }
             adminUser.password = utils.hashPassword(req.body.password);
-            await this.persistence.putUser(adminUser);
+            await this.persistence.users.updateSingle(adminUser);
             res.sendStatus(200);
         } catch (error) {
             next(error);
@@ -154,7 +154,7 @@ export default class App {
             if (req.body.password !== req.body.confirmPassword) {
                 throw { status: 400, message: "Password and confirm password must match." };
             }
-            let adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            let adminUser = await this.persistence.users.getSingleFiltered({ username: App.adminUsername });
             if (adminUser) {
                 throw { message: "The admin user has already been setup. Consider using the change password page to update the password." };
             }
@@ -162,7 +162,7 @@ export default class App {
                 username: App.adminUsername,
                 password: utils.hashPassword(req.body.password)
             };
-            adminUser = await this.persistence.postUser(adminUser);
+            adminUser = await this.persistence.users.insertSingle(adminUser);
             res.jwt(this.generateJWTPayload(adminUser, true));
             res.sendStatus(200);
         } catch (error) {
@@ -172,7 +172,7 @@ export default class App {
 
     async login(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const adminUser = await this.persistence.getUserByUsername(App.adminUsername);
+            const adminUser = await this.persistence.users.getSingleFiltered({ username: App.adminUsername });
             if (adminUser && utils.hashPassword(req.body.password) === adminUser.password) {
                 res.jwt(this.generateJWTPayload(adminUser, true));
                 res.sendStatus(200);
@@ -199,9 +199,9 @@ export default class App {
                 contestName: contestName
             };
             if (alternateName._id) {
-                await this.persistence.putAlternateName(alternateName);
+                await this.persistence.lineupalternatenames.updateSingle(alternateName);
             } else {
-                await this.persistence.postAlternateName(alternateName);
+                await this.persistence.lineupalternatenames.insertSingle(alternateName);
             }
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
@@ -212,7 +212,7 @@ export default class App {
     async deleteLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            await this.persistence.deleteAlternateName(id);
+            await this.persistence.lineupalternatenames.deleteSingle(id);
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
             next(error);
@@ -222,7 +222,7 @@ export default class App {
     async getLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            const alternateName = await this.persistence.getAlternateName(id);
+            const alternateName = await this.persistence.lineupalternatenames.getSingle(id);
             res.status(200).send(alternateName);
         } catch (error) {
             next(error);
@@ -231,7 +231,7 @@ export default class App {
 
     async getLineupAlternateNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const alternateNames = await this.persistence.getAlternateNames();
+            const alternateNames = await this.persistence.lineupalternatenames.getAll();
             res.status(200).send(alternateNames);
         } catch (error) {
             next(error);
@@ -242,9 +242,9 @@ export default class App {
         try {
             const id = idToObjectID(req.query.id);
             if (id) {
-                await this.persistence.deleteMissingName(id);
+                await this.persistence.lineupmissingnames.deleteSingle(id);
             } else {
-                await this.persistence.deleteMissingNames();
+                await this.persistence.lineupmissingnames.deleteAll();
             }
             res.redirect("/lineup/missingNames/list");
         } catch (error) {
@@ -254,7 +254,7 @@ export default class App {
 
     async getLineupMissingNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const missingNames = await this.persistence.getMissingNames();
+            const missingNames = await this.persistence.lineupmissingnames.getAll();
             res.status(200).send(missingNames);
         } catch (error) {
             next(error);
@@ -263,7 +263,7 @@ export default class App {
 
     async getWheelCategories(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const wheelCategories = await this.persistence.getWheelCategories();
+            const wheelCategories = await this.persistence.wheelcategories.getAll();
             res.status(200).send(wheelCategories);
         } catch (error) {
             next(error);
@@ -273,7 +273,7 @@ export default class App {
     async getWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            const wheelCategory = await this.persistence.getWheelCategory(id);
+            const wheelCategory = await this.persistence.wheelcategories.getSingle(id);
             res.status(200).send(wheelCategory);
         } catch (error) {
             next(error);
@@ -283,7 +283,7 @@ export default class App {
     async deleteWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            await this.persistence.deleteWheelCategory(id);
+            await this.persistence.wheelcategories.deleteSingle(id);
             res.sendStatus(200);
         } catch (error) {
             next(error);
@@ -299,9 +299,9 @@ export default class App {
                 name: name
             };
             if (wheelCategory._id) {
-                await this.persistence.putWheelCategory(wheelCategory);
+                await this.persistence.wheelcategories.updateSingle(wheelCategory);
             } else {
-                await this.persistence.postWheelCategory(wheelCategory);
+                await this.persistence.wheelcategories.insertSingle(wheelCategory);
             }
             res.redirect("/wheel/categories/list");
         } catch (error) {
@@ -311,7 +311,7 @@ export default class App {
 
     async getWheelWords(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const wheelWords = await this.persistence.getWheelWords();
+            const wheelWords = await this.persistence.wheelwords.getAll();
             res.status(200).send(wheelWords);
         } catch (error) {
             next(error);
@@ -321,7 +321,7 @@ export default class App {
     async getWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            const wheelWord = await this.persistence.getWheelWord(id);
+            const wheelWord = await this.persistence.wheelwords.getSingle(id);
             res.status(200).send(wheelWord);
         } catch (error) {
             next(error);
@@ -331,7 +331,7 @@ export default class App {
     async deleteWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
             const id = idToObjectID(req.query.id);
-            await this.persistence.deleteWheelWord(id);
+            await this.persistence.wheelwords.deleteSingle(id);
             res.sendStatus(200);
         } catch (error) {
             next(error);
@@ -349,10 +349,10 @@ export default class App {
                 word: word
             };
             if (wheelWord._id) {
-                await this.persistence.putWheelWord(wheelWord);
+                await this.persistence.wheelwords.updateSingle(wheelWord);
             } else {
                 wheelWord.approved = false;
-                await this.persistence.postWheelWord(wheelWord);
+                await this.persistence.wheelwords.insertSingle(wheelWord);
             }
             res.redirect(`/wheel/categories/${idToString(categoryID)}/list`);
         } catch (error) {
@@ -365,7 +365,7 @@ export default class App {
             const { ids } = req.body;
             const wordIDs = ids.split(",");
             for (const wordID of wordIDs) {
-                await this.persistence.putWheelWord({
+                await this.persistence.wheelwords.updateSingle({
                     approved: true,
                     _id: idToObjectID(wordID)
                 });
