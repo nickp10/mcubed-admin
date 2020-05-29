@@ -19,14 +19,12 @@ module.exports = {
             {
                 test: /\.(css)$/,
                 use: [
+                    "style-loader",
+                    "@teamsupercell/typings-for-css-modules-loader",
                     {
-                        loader: "style-loader"
-                    },
-                    {
-                        loader: "typings-for-css-modules-loader",
+                        loader: "css-loader",
                         query: {
-                            modules: true,
-                            namedExport: true
+                            modules: true
                         }
                     }
                 ]
@@ -42,7 +40,7 @@ module.exports = {
                         loader: "babel-loader",
                         options: {
                             cacheDirectory: true,
-                            presets: ["react", "env"]
+                            presets: ["@babel/preset-react", "@babel/preset-env"]
                         }
                     }
                 ]
@@ -53,13 +51,18 @@ module.exports = {
         extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".css"]
     },
     plugins: [
-        new CopyWebpackPlugin([{
-            from: path.join(APP_DIR, "images"),
-            to: path.join(BUILD_DIR, "images")
-        }, {
-            from: path.join(APP_DIR, "*.otf"),
-            to: BUILD_DIR,
-            flatten: true
-        }])
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.join(APP_DIR, "images"),
+                    to: path.join(BUILD_DIR, "images")
+                },
+                {
+                    from: path.join(APP_DIR, "*.otf").replace(/\\/g, '/'),
+                    to: BUILD_DIR,
+                    flatten: true
+                }
+            ]
+        })
     ]
 };

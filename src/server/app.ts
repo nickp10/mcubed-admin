@@ -12,7 +12,7 @@ import Persistence from "./persistence";
 import * as process from "process";
 import template from "./template";
 import utils from "../utils";
-import * as uuid4 from "uuid/v4";
+import { v4 as uuid4 } from "uuid";
 
 export default class App {
     persistence: Persistence;
@@ -211,7 +211,7 @@ export default class App {
 
     async deleteLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             await this.persistence.lineupalternatenames.deleteSingle(id);
             res.redirect("/lineup/alternateNames/list");
         } catch (error) {
@@ -221,7 +221,7 @@ export default class App {
 
     async getLineupAlternateName(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             const alternateName = await this.persistence.lineupalternatenames.getSingle(id);
             res.status(200).send(alternateName);
         } catch (error) {
@@ -240,7 +240,7 @@ export default class App {
 
     async deleteLineupMissingNames(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             if (id) {
                 await this.persistence.lineupmissingnames.deleteSingle(id);
             } else {
@@ -272,7 +272,7 @@ export default class App {
 
     async getWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             const wheelCategory = await this.persistence.wheelcategories.getSingle(id);
             res.status(200).send(wheelCategory);
         } catch (error) {
@@ -282,7 +282,7 @@ export default class App {
 
     async deleteWheelCategory(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             await this.persistence.wheelcategories.deleteSingle(id);
             res.sendStatus(200);
         } catch (error) {
@@ -320,7 +320,7 @@ export default class App {
 
     async getWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             const wheelWord = await this.persistence.wheelwords.getSingle(id);
             res.status(200).send(wheelWord);
         } catch (error) {
@@ -330,7 +330,7 @@ export default class App {
 
     async deleteWheelWord(req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> {
         try {
-            const id = idToObjectID(req.query.id);
+            const id = idToObjectID(<string>req.query.id);
             await this.persistence.wheelwords.deleteSingle(id);
             res.sendStatus(200);
         } catch (error) {

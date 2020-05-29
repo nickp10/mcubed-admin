@@ -8,7 +8,7 @@ import * as sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface CategoryWordListProps {
-    categoryID: ObjectID;
+    categoryID: string;
 }
 
 export interface CategoryWordListState {

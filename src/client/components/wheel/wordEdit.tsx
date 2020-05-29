@@ -8,7 +8,7 @@ import * as React from "react";
 import * as sharedStyles from "../shared.css";
 
 export interface WordEditProps {
-    categoryID: ObjectID;
+    categoryID: string;
 }
 
 export interface WordEditState {
@@ -57,7 +57,7 @@ export default class WordEditComponent extends Component<RouteComponentProps<Wor
                 this.useWord(word);
             } else {
                 this.useWord({
-                    categoryID: this.props.match.params.categoryID
+                    categoryID: new ObjectID(this.props.match.params.categoryID)
                 });
             }
         } catch (error) {
