@@ -1,43 +1,30 @@
 import { Component } from "react";
 import { IWheelWord } from "../../../interfaces";
-import { ObjectID } from "bson";
-import { RouteComponentProps } from "react-router-dom";
-import { idToString}  from "../../../objectIDUtils";
-import * as qs from "querystring";
+import { idToString, idToObjectID }  from "../../../objectIDUtils";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 
 export interface WordEditProps {
     categoryID: string;
+    wordID: string;
 }
 
 export interface WordEditState {
     error?: string;
     isLoaded?: boolean;
-    word?: IWheelWord;
-    wordID?: string;
+    word?: IWheelWord
 }
 
-export default class WordEditComponent extends Component<RouteComponentProps<WordEditProps>, WordEditState> {
-    constructor(props: RouteComponentProps<WordEditProps>, context?: any) {
-        super(props, context);
-        const search = this.props.location.search;
-        const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);
-        this.state = {
-            wordID: this.getQueryStringValue(query, "id")
-        };
-    }
-
-    getQueryStringValue(query: qs.ParsedUrlQuery,  key: string): string {
-        const value = query[key];
-        return Array.isArray(value) ? (value.length > 0 ? value[0] : undefined) : value;
+export default class WordEditComponent extends Component<WordEditProps, WordEditState> {
+    constructor(props: WordEditProps) {
+        super(props);
+        this.state = { };
     }
 
     useWord(word: IWheelWord): void {
         this.setState((previousState, props) => {
             return {
                 word: word,
-                wordID: previousState.wordID,
                 isLoaded: true
             };
         });
@@ -45,8 +32,8 @@ export default class WordEditComponent extends Component<RouteComponentProps<Wor
 
     async componentDidMount() {
         try {
-            if (this.state.wordID) {
-                const res = await fetch(`/wheel/words/get/json?id=${this.state.wordID}`, {
+            if (this.props.wordID) {
+                const res = await fetch(`/wheel/words/get/json?id=${this.props.wordID}`, {
                     credentials: "same-origin"
                 });
                 if (res.status !== 200) {
@@ -57,13 +44,12 @@ export default class WordEditComponent extends Component<RouteComponentProps<Wor
                 this.useWord(word);
             } else {
                 this.useWord({
-                    categoryID: new ObjectID(this.props.match.params.categoryID)
+                    categoryID: idToObjectID(this.props.categoryID)
                 });
             }
         } catch (error) {
             this.setState((previousState, props) => {
                 return {
-                    wordID: previousState.wordID,
                     error: error.message
                 };
             });

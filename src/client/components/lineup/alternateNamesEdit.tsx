@@ -1,45 +1,30 @@
 import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString}  from "../../../objectIDUtils";
-import * as moment from "moment";
-import * as qs from "querystring";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 
 export interface AlternateNamesEditProps {
+    alternateNameID: string;
+    externalName: string;
 }
 
 export interface AlternateNamesEditState {
     alternateName?: IAlternateName;
-    alternateNameID?: string;
-    externalName?: string;
     error?: string;
     isLoaded?: boolean;
 }
 
-export default class AlternateNamesEditComponent extends Component<RouteComponentProps<AlternateNamesEditProps>, AlternateNamesEditState> {
-    constructor(props: RouteComponentProps<AlternateNamesEditProps>, context?: any) {
-        super(props, context);
-        const search = this.props.location.search;
-        const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);
-        this.state = {
-            alternateNameID: this.getQueryStringValue(query, "id"),
-            externalName: this.getQueryStringValue(query, "externalName")
-        };
-    }
-
-    getQueryStringValue(query: qs.ParsedUrlQuery,  key: string): string {
-        const value = query[key];
-        return Array.isArray(value) ? (value.length > 0 ? value[0] : undefined) : value;
+export default class AlternateNamesEditComponent extends Component<AlternateNamesEditProps, AlternateNamesEditState> {
+    constructor(props: AlternateNamesEditProps) {
+        super(props);
+        this.state = { };
     }
 
     useAlternateName(alternateName: IAlternateName): void {
         this.setState((previousState, props) => {
             return {
                 alternateName: alternateName,
-                alternateNameID: previousState.alternateNameID,
-                externalName: previousState.externalName,
                 isLoaded: true
             };
         });
@@ -47,8 +32,8 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
 
     async componentDidMount() {
         try {
-            if (this.state.alternateNameID) {
-                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.state.alternateNameID}`, {
+            if (this.props.alternateNameID) {
+                const res = await fetch(`/lineup/alternateNames/get/json?id=${this.props.alternateNameID}`, {
                     credentials: "same-origin"
                 });
                 if (res.status !== 200) {
@@ -59,14 +44,12 @@ export default class AlternateNamesEditComponent extends Component<RouteComponen
                 this.useAlternateName(alternateName);
             } else {
                 this.useAlternateName({
-                    externalName: this.state.externalName
+                    externalName: this.props.externalName
                 });
             }
         } catch (error) {
             this.setState((previousState, props) => {
                 return {
-                    alternateNameID: previousState.alternateNameID,
-                    externalName: previousState.externalName,
                     error: error.message
                 };
             });

@@ -1,8 +1,7 @@
 import { Component } from "react";
-import { RouteComponentProps } from "react-router-dom";
 import * as querystring from "querystring";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 
 export interface ChangePasswordProps {
 }
@@ -15,9 +14,9 @@ export interface ChangePasswordState {
     confirmPassword?: string;
 }
 
-export default class ChangePasswordComponent extends Component<RouteComponentProps<ChangePasswordProps>, ChangePasswordState> {
-    constructor(props: RouteComponentProps<ChangePasswordProps>, context?: any) {
-        super(props, context);
+export default class ChangePasswordComponent extends Component<ChangePasswordProps, ChangePasswordState> {
+    constructor(props: ChangePasswordProps) {
+        super(props);
         this.state = { };
     }
 

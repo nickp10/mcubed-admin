@@ -1,6 +1,6 @@
 @font-face {
     font-family: molot;
-    src: url("/Molot.otf") format("opentype");
+    src: url("../Molot.otf") format("opentype");
 }
 
 :global(a), :global(a):hover, :global(a):visited {

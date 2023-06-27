@@ -23,7 +23,7 @@ module.exports = {
                     "@teamsupercell/typings-for-css-modules-loader",
                     {
                         loader: "css-loader",
-                        query: {
+                        options: {
                             modules: true
                         }
                     }
@@ -48,7 +48,11 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".css"]
+        extensions: [".js", ".jsx", ".json", ".ts", ".tsx", ".css"],
+        fallback: {
+            "crypto": require.resolve("crypto-js"),
+            "querystring": require.resolve("querystring-es3")
+        }
     },
     plugins: [
         new CopyWebpackPlugin({
@@ -56,11 +60,6 @@ module.exports = {
                 {
                     from: path.join(APP_DIR, "images"),
                     to: path.join(BUILD_DIR, "images")
-                },
-                {
-                    from: path.join(APP_DIR, "*.otf").replace(/\\/g, '/'),
-                    to: BUILD_DIR,
-                    flatten: true
                 }
             ]
         })

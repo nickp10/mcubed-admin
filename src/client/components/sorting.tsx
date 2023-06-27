@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as sharedStyles from "./shared.css";
+import sharedStyles from "./shared.css";
 
 export function compareObjects<T extends { sortAscending?: boolean, sortProperty?: string }>(obj1: any, obj2: any, state: T): number {
     if (!obj1) {

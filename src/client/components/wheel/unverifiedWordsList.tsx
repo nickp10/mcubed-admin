@@ -1,11 +1,10 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString, idEquals}  from "../../../objectIDUtils";
-import { ObjectID } from "bson";
+import { ObjectId } from "bson";
 import * as querystring from "querystring";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface UnverifiedWordsListProps {
@@ -20,9 +19,9 @@ export interface UnverifiedWordsListState {
     sortProperty?: string;
 }
 
-export default class UnverifiedWordsListComponent extends Component<RouteComponentProps<UnverifiedWordsListProps>, UnverifiedWordsListState> {
-    constructor(props: RouteComponentProps<UnverifiedWordsListProps>, context?: any) {
-        super(props, context);
+export default class UnverifiedWordsListComponent extends Component<UnverifiedWordsListProps, UnverifiedWordsListState> {
+    constructor(props: UnverifiedWordsListProps) {
+        super(props);
         this.state = {
             categories: [],
             unverifiedWords: [],
@@ -151,7 +150,7 @@ export default class UnverifiedWordsListComponent extends Component<RouteCompone
         }
     }
 
-    formatCategoryName(id: ObjectID): string {
+    formatCategoryName(id: ObjectId): string {
         const category = this.state.categories.find(c => idEquals(c._id, id));
         return category ? category.name : undefined;
     }

@@ -1,9 +1,8 @@
-import * as moment from "moment";
+import { format } from "date-and-time";
 
 export class Log {
     formatMessage(message: string): string {
-        const now = moment();
-        return `${now.format("MM/DD/YYYY HH:mm:ss.SSS")} - ${message}`;
+        return `${format(new Date(), "MM/DD/YYYY HH:mm:ss.SSS")} - ${message}`;
     }
 
     error(message: string): void {

@@ -1,9 +1,8 @@
 import { Component } from "react";
 import { IWheelCategory } from "../../../interfaces";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString, idEquals}  from "../../../objectIDUtils";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface CategoriesListProps {
@@ -17,9 +16,9 @@ export interface CategoriesListState {
     sortProperty?: string;
 }
 
-export default class CategoriesListComponent extends Component<RouteComponentProps<CategoriesListProps>, CategoriesListState> {
-    constructor(props: RouteComponentProps<CategoriesListProps>, context?: any) {
-        super(props, context);
+export default class CategoriesListComponent extends Component<CategoriesListProps, CategoriesListState> {
+    constructor(props: CategoriesListProps) {
+        super(props);
         this.state = {
             categories: [],
             sortAscending: true,

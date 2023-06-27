@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes, matchPath, useLocation, useSearchParams, useParams } from "react-router-dom";
 import clientAppState from "../clientAppState";
 import AlternateNamesEditComponent from "./lineup/alternateNamesEdit";
 import AlternateNamesListComponent from "./lineup/alternateNamesList";
@@ -13,7 +13,7 @@ import MissingNamesListComponent from "./lineup/missingNamesList";
 import UnverifiedWordsListComponent from "./wheel/unverifiedWordsList";
 import WordEditComponent from "./wheel/wordEdit";
 import * as React from "react";
-import * as styles from "./app.css";
+import styles from "./app.css";
 
 export interface AppProps {
 }
@@ -23,8 +23,8 @@ export interface AppState {
 }
 
 export default class App extends Component<AppProps, AppState> {
-    constructor(props: AppProps, context?: any) {
-        super(props, context);
+    constructor(props: AppProps) {
+        super(props);
         this.state = { };
     }
 
@@ -37,12 +37,27 @@ export default class App extends Component<AppProps, AppState> {
         const { serverError } = clientAppState;
         const { error } = this.state;
         const NavigationItem = ({ match, to, text, ...rest }) => (
-            <Route path={match} children={(routeProps) => (
-                <td className={`${styles.navigationItem} ${routeProps.match ? styles.active : ''}`} onClick={this.navigationItemOnClick.bind(this, to)}>
-                    <a href={to}>{text}</a>
-                </td>
-            )} />
+            <td className={`${styles.navigationItem} ${matchPath(match, useLocation().pathname) ? styles.active : ''}`} onClick={this.navigationItemOnClick.bind(this, to)}>
+                <a href={to}>{text}</a>
+            </td>
         );
+        const AlternateNamesEditComponentWrapper = () => {
+            const [ searchParams ] = useSearchParams();
+            return <AlternateNamesEditComponent alternateNameID={searchParams.get("id")} externalName={searchParams.get("externalName")} />
+        };
+        const CategoryEditComponentWrapper = () => {
+            const [ searchParams ] = useSearchParams();
+            return <CategoryEditComponent categoryID={searchParams.get("id")} />
+        };
+        const CategoryWordListComponentWrapper = () => {
+            const { categoryID } = useParams();
+            return <CategoryWordListComponent categoryID={categoryID} />
+        };
+        const WordEditComponentWrapper = () => {
+            const { categoryID } = useParams();
+            const [ searchParams ] = useSearchParams();
+            return <WordEditComponent categoryID={categoryID} wordID={searchParams.get("id")} />
+        };
         return (
             <BrowserRouter>
                 <div className={styles.app}>
@@ -73,11 +88,11 @@ export default class App extends Component<AppProps, AppState> {
                         {clientAppState.isLoggedIn && (
                             <table className={styles.navigationTable}>
                                 <tr>
-                                    <NavigationItem match="/lineup/alternateNames" to="/lineup/alternateNames/list" text="Lineup: Alternate Names" />
-                                    <NavigationItem match="/lineup/missingNames" to="/lineup/missingNames/list" text="Lineup: Missing Names" />
-                                    <NavigationItem match="/wheel/categories" to="/wheel/categories/list" text="Wheel Capture: Categories" />
-                                    <NavigationItem match="/wheel/duplicates" to="/wheel/duplicates/list" text="Wheel Capture: Duplicates" />
-                                    <NavigationItem match="/wheel/unverified" to="/wheel/unverified/list" text="Wheel Capture: Unverified" />
+                                    <NavigationItem match="/lineup/alternateNames/*" to="/lineup/alternateNames/list" text="Lineup: Alternate Names" />
+                                    <NavigationItem match="/lineup/missingNames/*" to="/lineup/missingNames/list" text="Lineup: Missing Names" />
+                                    <NavigationItem match="/wheel/categories/*" to="/wheel/categories/list" text="Wheel Capture: Categories" />
+                                    <NavigationItem match="/wheel/duplicates/*" to="/wheel/duplicates/list" text="Wheel Capture: Duplicates" />
+                                    <NavigationItem match="/wheel/unverified/*" to="/wheel/unverified/list" text="Wheel Capture: Unverified" />
                                 </tr>
                             </table>
                         )}
@@ -86,19 +101,19 @@ export default class App extends Component<AppProps, AppState> {
                                 <div className={styles.error}>{serverError}</div>
                             )}
                             {!serverError && (
-                                <Switch>
-                                    <Route path="/login" component={LoginComponent} />
-                                    <Route path="/changePassword" component={ChangePasswordComponent} />
-                                    <Route path="/lineup/alternateNames/edit" component={AlternateNamesEditComponent} />
-                                    <Route path="/lineup/alternateNames/list" component={AlternateNamesListComponent} />
-                                    <Route path="/lineup/missingNames/list" component={MissingNamesListComponent} />
-                                    <Route path="/wheel/categories/edit" component={CategoryEditComponent} />
-                                    <Route path="/wheel/categories/list" component={CategoriesListComponent} />
-                                    <Route path="/wheel/categories/:categoryID/list" component={CategoryWordListComponent} />
-                                    <Route path="/wheel/categories/:categoryID/words/edit" component={WordEditComponent} />
-                                    <Route path="/wheel/duplicates/list" component={DuplicateWordsListComponent} />
-                                    <Route path="/wheel/unverified/list" component={UnverifiedWordsListComponent} />
-                                </Switch>
+                                <Routes>
+                                    <Route path="/login" element={<LoginComponent />} />
+                                    <Route path="/changePassword" element={<ChangePasswordComponent />} />
+                                    <Route path="/lineup/alternateNames/edit" element={<AlternateNamesEditComponentWrapper />} />
+                                    <Route path="/lineup/alternateNames/list" element={<AlternateNamesListComponent />} />
+                                    <Route path="/lineup/missingNames/list" element={<MissingNamesListComponent />} />
+                                    <Route path="/wheel/categories/edit" element={<CategoryEditComponentWrapper />} />
+                                    <Route path="/wheel/categories/list" element={<CategoriesListComponent />} />
+                                    <Route path="/wheel/categories/:categoryID/list" element={<CategoryWordListComponentWrapper />} />
+                                    <Route path="/wheel/categories/:categoryID/words/edit" element={<WordEditComponentWrapper />} />
+                                    <Route path="/wheel/duplicates/list" element={<DuplicateWordsListComponent />} />
+                                    <Route path="/wheel/unverified/list" element={<UnverifiedWordsListComponent />} />
+                                </Routes>
                             )}
                         </div>
                         <div className={styles.copyrightDiv}>

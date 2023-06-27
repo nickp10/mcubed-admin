@@ -1,10 +1,9 @@
 import { Component } from "react";
 import { IWheelCategory, IWheelWord } from "../../../interfaces";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString, idEquals}  from "../../../objectIDUtils";
-import { ObjectID } from "bson";
+import { ObjectId } from "bson";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface DuplicateWordsListProps {
@@ -19,9 +18,9 @@ export interface DuplicateWordsListState {
     sortProperty?: string;
 }
 
-export default class DuplicateWordsListComponent extends Component<RouteComponentProps<DuplicateWordsListProps>, DuplicateWordsListState> {
-    constructor(props: RouteComponentProps<DuplicateWordsListProps>, context?: any) {
-        super(props, context);
+export default class DuplicateWordsListComponent extends Component<DuplicateWordsListProps, DuplicateWordsListState> {
+    constructor(props: DuplicateWordsListProps) {
+        super(props);
         this.state = {
             categories: [],
             duplicateWords: [],
@@ -120,7 +119,7 @@ export default class DuplicateWordsListComponent extends Component<RouteComponen
         return duplicates;
     }
 
-    formatCategoryName(id: ObjectID): string {
+    formatCategoryName(id: ObjectId): string {
         const category = this.state.categories.find(c => idEquals(c._id, id));
         return category ? category.name : undefined;
     }

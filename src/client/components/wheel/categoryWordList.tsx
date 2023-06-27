@@ -1,10 +1,8 @@
 import { Component } from "react";
 import { IWheelWord } from "../../../interfaces";
-import { ObjectID } from "bson";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString, idEquals}  from "../../../objectIDUtils";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface CategoryWordListProps {
@@ -19,9 +17,9 @@ export interface CategoryWordListState {
     sortProperty?: string;
 }
 
-export default class CategoriesListComponent extends Component<RouteComponentProps<CategoryWordListProps>, CategoryWordListState> {
-    constructor(props: RouteComponentProps<CategoryWordListProps>, context?: any) {
-        super(props, context);
+export default class CategoriesListComponent extends Component<CategoryWordListProps, CategoryWordListState> {
+    constructor(props: CategoryWordListProps) {
+        super(props);
         this.state = {
             words: [],
             sortAscending: true,
@@ -52,7 +50,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
             const words: IWheelWord[] = await res.json();
             this.setState((previousState, props) => {
                 return {
-                    words: words.filter(w => idEquals(w.categoryID, this.props.match.params.categoryID)),
+                    words: words.filter(w => idEquals(w.categoryID, props.categoryID)),
                     sortAscending: previousState.sortAscending,
                     sortProperty: previousState.sortProperty,
                     isLoaded: true
@@ -118,7 +116,7 @@ export default class CategoriesListComponent extends Component<RouteComponentPro
                     }
                     <tr>
                         <th colSpan={2} className={sharedStyles.center}>
-                            <a className={sharedStyles.link} href={`/wheel/categories/${idToString(this.props.match.params.categoryID)}/words/edit`}>Add</a>
+                            <a className={sharedStyles.link} href={`/wheel/categories/${idToString(this.props.categoryID)}/words/edit`}>Add</a>
                         </th>
                     </tr>
                 </table>

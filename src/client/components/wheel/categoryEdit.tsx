@@ -1,42 +1,29 @@
 import { Component } from "react";
 import { IWheelCategory } from "../../../interfaces";
-import { ObjectID } from "bson";
-import { RouteComponentProps } from "react-router-dom";
-import { idToString, idToObjectID}  from "../../../objectIDUtils";
-import * as qs from "querystring";
+import { idToString }  from "../../../objectIDUtils";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 
 export interface CategoryEditProps {
+    categoryID: string;
 }
 
 export interface CategoryEditState {
     category?: IWheelCategory;
-    categoryID?: ObjectID;
     error?: string;
     isLoaded?: boolean;
 }
 
-export default class CategoryEditComponent extends Component<RouteComponentProps<CategoryEditProps>, CategoryEditState> {
-    constructor(props: RouteComponentProps<CategoryEditProps>, context?: any) {
-        super(props, context);
-        const search = this.props.location.search;
-        const query = qs.parse(search && search.startsWith("?") ? search.substr(1) : search);
-        this.state = {
-            categoryID: idToObjectID(this.getQueryStringValue(query, "id"))
-        };
-    }
-
-    getQueryStringValue(query: qs.ParsedUrlQuery,  key: string): string {
-        const value = query[key];
-        return Array.isArray(value) ? (value.length > 0 ? value[0] : undefined) : value;
+export default class CategoryEditComponent extends Component<CategoryEditProps, CategoryEditState> {
+    constructor(props: CategoryEditProps) {
+        super(props);
+        this.state = { };
     }
 
     useCategory(category: IWheelCategory): void {
         this.setState((previousState, props) => {
             return {
                 category: category,
-                categoryID: previousState.categoryID,
                 isLoaded: true
             };
         });
@@ -44,8 +31,8 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
 
     async componentDidMount() {
         try {
-            if (this.state.categoryID) {
-                const res = await fetch(`/wheel/categories/get/json?id=${idToString(this.state.categoryID)}`, {
+            if (this.props.categoryID) {
+                const res = await fetch(`/wheel/categories/get/json?id=${this.props.categoryID}`, {
                     credentials: "same-origin"
                 });
                 if (res.status !== 200) {
@@ -60,7 +47,6 @@ export default class CategoryEditComponent extends Component<RouteComponentProps
         } catch (error) {
             this.setState((previousState, props) => {
                 return {
-                    categoryID: previousState.categoryID,
                     error: error.message
                 };
             });

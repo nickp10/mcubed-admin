@@ -1,10 +1,9 @@
 import { Component } from "react";
 import { IAlternateName } from "../../../interfaces";
-import { RouteComponentProps } from "react-router-dom";
 import { idToString}  from "../../../objectIDUtils";
-import * as moment from "moment";
+import { format } from "date-and-time";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 import SortHeader, * as sorting from "../sorting";
 
 export interface AlternateNamesListProps {
@@ -18,9 +17,9 @@ export interface AlternateNamesListState {
     sortProperty?: string;
 }
 
-export default class AlternateNamesListComponent extends Component<RouteComponentProps<AlternateNamesListProps>, AlternateNamesListState> {
-    constructor(props: RouteComponentProps<AlternateNamesListProps>, context?: any) {
-        super(props, context);
+export default class AlternateNamesListComponent extends Component<AlternateNamesListProps, AlternateNamesListState> {
+    constructor(props: AlternateNamesListProps) {
+        super(props);
         this.state = {
             alternateNames: [],
             sortAscending: true,
@@ -31,7 +30,7 @@ export default class AlternateNamesListComponent extends Component<RouteComponen
     formatDateHTML(alternateName: IAlternateName) {
         let date = "N/A";
         if (alternateName.lastUsedDate) {
-             date = moment(alternateName.lastUsedDate).format("MM/DD/YYYY hh:mm:ss A");
+            date = format(alternateName.lastUsedDate, "MM/DD/YYYY hh:mm:ss A");
         }
         return {
             __html: date.replace(/\s/g, "&nbsp;")

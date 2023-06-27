@@ -1,6 +1,6 @@
-import { ObjectID } from "bson";
+import { ObjectId } from "bson";
 
-export function idToString(id: string | ObjectID): string {
+export function idToString(id: string | ObjectId): string {
     if (!id) {
         return "";
     } else if (typeof id === "string") {
@@ -10,17 +10,17 @@ export function idToString(id: string | ObjectID): string {
     }
 };
 
-export function idToObjectID(id: string | ObjectID): ObjectID {
+export function idToObjectID(id: string | ObjectId): ObjectId {
     if (!id) {
         return undefined;
-    } else if (id instanceof ObjectID) {
+    } else if (id instanceof ObjectId) {
         return id;
     } else {
-        return new ObjectID(id);
+        return new ObjectId(id);
     }
 };
 
-export function idEquals(id1: string | ObjectID, id2: string | ObjectID): boolean {
+export function idEquals(id1: string | ObjectId, id2: string | ObjectId): boolean {
     const objectID1 = idToObjectID(id1);
     const objectID2 = idToObjectID(id2);
     if (objectID1) {

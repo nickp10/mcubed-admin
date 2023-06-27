@@ -1,13 +1,13 @@
 import { IAlternateName, IMissingName, IUser, IWheelCategory, IWheelWord } from "../interfaces";
-import { MongoClient, Db, ObjectID } from "mongodb";
+import { MongoClient, Db, ObjectId } from "mongodb";
 import log from "./log";
 
-export interface ICollectionPersistence<T extends { _id?: ObjectID }> {
+export interface ICollectionPersistence<T extends { _id?: ObjectId }> {
     deleteAll(): Promise<void>;
-    deleteSingle(id: ObjectID): Promise<void>;
+    deleteSingle(id: ObjectId): Promise<void>;
     getAll(): Promise<T[]>;
     getAllFiltered(filter: T): Promise<T[]>;
-    getSingle(id: ObjectID): Promise<T>;
+    getSingle(id: ObjectId): Promise<T>;
     getSingleFiltered(filter: T): Promise<T>;
     insertSingle(document: T): Promise<T>;
     insertMany(documents: IterableIterator<T>): Promise<T[]>;
@@ -33,13 +33,13 @@ export default class Persistence {
         this.wheelwords = this.createCollectionPersistence<IWheelWord>("wheelwords");
     }
 
-    private createCollectionPersistence<T extends { _id?: ObjectID }>(table: string): ICollectionPersistence<T> {
+    private createCollectionPersistence<T extends { _id?: ObjectId }>(table: string): ICollectionPersistence<T> {
         return {
             deleteAll: () => this.deleteAll(table),
-            deleteSingle: (id: ObjectID) => this.deleteSingle(table, id),
+            deleteSingle: (id: ObjectId) => this.deleteSingle(table, id),
             getAll: () => this.getAll(table),
             getAllFiltered: (filter: T) => this.getAllFiltered(table, filter),
-            getSingle: (id: ObjectID) => this.getSingle(table, id),
+            getSingle: (id: ObjectId) => this.getSingle(table, id),
             getSingleFiltered: (filter: T) => this.getSingleFiltered(table, filter),
             insertSingle: (document: T) => this.insertSingle(table, document),
             insertMany: (documents: IterableIterator<T>) => this.insertMany(table, documents),
@@ -87,7 +87,7 @@ export default class Persistence {
         }
     }
 
-    private async deleteSingle(table: string, id: ObjectID): Promise<void> {
+    private async deleteSingle(table: string, id: ObjectId): Promise<void> {
         this.checkValid();
         try {
             const db = await this.connectDB();
@@ -102,7 +102,7 @@ export default class Persistence {
         this.checkValid();
         try {
             const db = await this.connectDB();
-            const cursor = await db.collection(table).find<T>();
+            const cursor = await db.collection(table).find<T>({ });
             return await cursor.toArray();
         } catch (error) {
             log.error(error);
@@ -122,7 +122,7 @@ export default class Persistence {
         }
     }
 
-    private async getSingle<T>(table: string, id: ObjectID): Promise<T> {
+    private async getSingle<T>(table: string, id: ObjectId): Promise<T> {
         this.checkValid();
         try {
             const db = await this.connectDB();
@@ -143,7 +143,7 @@ export default class Persistence {
         }
     }
 
-    private async insertSingle<T extends { _id?: ObjectID }>(table: string, item: T): Promise<T> {
+    private async insertSingle<T extends { _id?: ObjectId }>(table: string, item: T): Promise<T> {
         this.checkValid();
         try {
             const db = await this.connectDB();
@@ -157,7 +157,7 @@ export default class Persistence {
         }
     }
 
-    private async insertMany<T extends { _id?: ObjectID }>(table: string, items: IterableIterator<T>): Promise<T[]> {
+    private async insertMany<T extends { _id?: ObjectId }>(table: string, items: IterableIterator<T>): Promise<T[]> {
         this.checkValid();
         try {
             const db = await this.connectDB();
@@ -178,7 +178,7 @@ export default class Persistence {
         }
     }
 
-    private async updateSingle<T extends { _id?: ObjectID }>(table: string, item: T): Promise<void> {
+    private async updateSingle<T extends { _id?: ObjectId }>(table: string, item: T): Promise<void> {
         this.checkValid();
         try {
             const db = await this.connectDB();

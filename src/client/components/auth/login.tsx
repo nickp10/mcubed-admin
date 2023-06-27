@@ -1,9 +1,8 @@
 import { Component } from "react";
-import { RouteComponentProps } from "react-router-dom";
 import clientAppState from "../../clientAppState";
 import * as querystring from "querystring";
 import * as React from "react";
-import * as sharedStyles from "../shared.css";
+import sharedStyles from "../shared.css";
 
 export interface LoginProps {
 }
@@ -15,9 +14,9 @@ export interface LoginState {
     confirmPassword?: string;
 }
 
-export default class LoginComponent extends Component<RouteComponentProps<LoginProps>, LoginState> {
-    constructor(props: RouteComponentProps<LoginProps>, context?: any) {
-        super(props, context);
+export default class LoginComponent extends Component<LoginProps, LoginState> {
+    constructor(props: LoginProps) {
+        super(props);
         this.state = { };
     }
 
